@@ -7,7 +7,7 @@ import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
 // import { DateTime } from "luxon";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import {
-  KONGSWAP_CANISTER_ID_IC,
+  ICPSWAP_CANISTER_ID,
   GLDT_LEDGER_CANISTER_ID,
   GOLDAO_LEDGER_CANISTER_ID_IC,
   ICP_LEDGER_CANISTER_ID_IC,
@@ -15,11 +15,11 @@ import {
 } from "../constants";
 import { idlFactory as idlFactoryStake } from "../services/gldt_stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "../services/ledger/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "../services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "../services/icpswap/idlFactory";
 import get_all_stake_positions from "../services/gldt_stake/get_all_stake_positions";
 import icrc1_fee from "../services/ledger/icrc1_fee";
 import icrc1_decimals from "../services/ledger/icrc1_decimals";
-import swap_amounts from "../services/kongswap/swap_amounts";
+import get_token_price_usd from "../services/icpswap/get_token_price_usd";
 
 export interface Reward {
   canister_id: string;
@@ -82,9 +82,9 @@ const useGetAllStakePositions = (
           agent,
           canisterId: canister_id,
         });
-        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+        const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
           agent,
-          canisterId: KONGSWAP_CANISTER_ID_IC,
+          canisterId: ICPSWAP_CANISTER_ID,
         });
         const actorLedgerGLDT = Actor.createActor(idlFactoryLedger, {
           agent,
@@ -105,11 +105,9 @@ const useGetAllStakePositions = (
         if (!result.length) return [];
 
         const decimalsGLDT = await icrc1_decimals(actorLedgerGLDT);
-        const priceGLDT = await swap_amounts(actorKongswap, {
-          from: "GLDT",
-          to: "ckUSDT",
-          amount: 1n,
-        });
+        const priceGLDT = await get_token_price_usd(
+          actorIcpswap, GLDT_LEDGER_CANISTER_ID, "GLDT", { agent }
+        );
 
         const res = await Promise.all(
           result.map(async (position) => {
@@ -156,11 +154,9 @@ const useGetAllStakePositions = (
                 const is_amount_below_fee =
                   token_reward.amount <= fee && token_reward.amount > 0n;
 
-                const price = await swap_amounts(actorKongswap, {
-                  from: token.name,
-                  to: "ckUSDT",
-                  amount: 1n,
-                });
+                const price_usd = await get_token_price_usd(
+                  actorIcpswap, token.canister_id, token.name, { agent }
+                );
                 const amount = Number(token_reward.amount) / 10 ** decimals;
 
                 return {
@@ -170,7 +166,7 @@ const useGetAllStakePositions = (
                   is_amount_below_fee,
                   amount,
                   amount_e8s: token_reward.amount,
-                  amount_usd: price.mid_price * amount,
+                  amount_usd: price_usd * amount,
                 };
               })
             );
@@ -184,7 +180,7 @@ const useGetAllStakePositions = (
                 ...event,
                 amount_e8s: amount,
                 amount: dissolved_amount,
-                amount_usd: priceGLDT.mid_price * dissolved_amount,
+                amount_usd: priceGLDT * dissolved_amount,
                 dissolved_date,
                 is_withdrawable: dissolved_date <= date_now,
                 remaining_time: Math.max(dissolved_date - date_now, 0),
@@ -230,7 +226,7 @@ const useGetAllStakePositions = (
               age_bonus_multiplier: data.age_bonus_multiplier,
               staked_amount,
               staked_amount_e8s: data.staked,
-              staked_amount_usd: priceGLDT.mid_price * staked_amount,
+              staked_amount_usd: priceGLDT * staked_amount,
               total_rewards_amount,
               total_rewards_amount_e8s,
               total_rewards_amount_usd,

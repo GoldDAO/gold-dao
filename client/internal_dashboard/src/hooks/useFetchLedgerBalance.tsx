@@ -4,12 +4,12 @@ import {
   UseQueryResult,
 } from "@tanstack/react-query";
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { KONGSWAP_CANISTER_ID_IC } from "../constants";
+import { ICPSWAP_CANISTER_ID } from "../constants";
 import { idlFactory as idlFactoryLedger } from "../services/ledger/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "../services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "../services/icpswap/idlFactory";
 import icrc1_balance_of from "../services/ledger/icrc1_balance_of";
 import icrc1_decimals from "../services/ledger/icrc1_decimals";
-import swap_amounts from "../services/kongswap/swap_amounts";
+import get_token_price_usd from "../services/icpswap/get_token_price_usd";
 
 interface LedgerBalanceData {
   amount: number;
@@ -62,28 +62,26 @@ const useFetchLedgerBalance = (
         subaccount,
       });
 
-      const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+      const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
         agent,
-        canisterId: KONGSWAP_CANISTER_ID_IC,
+        canisterId: ICPSWAP_CANISTER_ID,
       });
 
       const decimals = await icrc1_decimals(actorLedger);
 
-      const price = await swap_amounts(actorKongswap, {
-        from: ledger,
-        to: "ckUSDT",
-        amount: 1n,
-      });
+      const price_usd = await get_token_price_usd(
+        actorIcpswap, canisterId, ledger, { agent }
+      );
 
       const amount = Number(amount_e8s) / 10 ** decimals;
-      const amount_usd = amount * price.mid_price;
+      const amount_usd = amount * price_usd;
 
       return {
         amount,
         amount_e8s,
         amount_usd,
         decimals,
-        price_usd: amount * price.mid_price,
+        price_usd: amount * price_usd,
       };
     },
     placeholderData,
