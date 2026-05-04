@@ -69,7 +69,8 @@ const useFetchTokenPrice = (
         const priceUSD = await get_token_price_usd(
           actorIcpswap,
           from_canister_id,
-          from
+          from,
+          { agent }
         );
 
         return {

@@ -15,7 +15,7 @@ import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_poo
 import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import list_neurons from "@services/sns_governance/list_neurons";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
-import { fetch_all_tokens, find_token_price_usd } from "@services/icpswap/get_token_price_usd";
+import get_token_price_usd from "@services/icpswap/get_token_price_usd";
 import { TOKENS } from "@shared/utils/tokens";
 import { Neuron } from "./index";
 
@@ -63,8 +63,6 @@ const useGetAllNeuronsRewards = (
           owner,
         });
 
-        const allTokens = await fetch_all_tokens(actorIcpswap);
-
         const data = await Promise.all(
           TOKENS.filter((token) =>
             ["GLDT", "OGY", "ICP", "GOLDAO", "WTN"].includes(token.name)
@@ -74,10 +72,8 @@ const useGetAllNeuronsRewards = (
               canisterId: token.canister_id,
             });
             const decimals = await icrc1_decimals(actorLedger);
-            const price_usd = find_token_price_usd(
-              allTokens,
-              token.canister_id,
-              token.name
+            const price_usd = await get_token_price_usd(
+              actorIcpswap, token.canister_id, token.name, { agent }
             );
             const neuronData = await Promise.all(
               neurons.map(async (neuron) => {
