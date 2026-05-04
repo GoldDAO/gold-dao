@@ -69,7 +69,9 @@ const useFetchLedgerBalance = (
       const fee_e8s = await icrc1_fee(actorLedger);
       const decimals = await icrc1_decimals(actorLedger);
 
-      const price_usd = await get_token_price_usd(actorIcpswap, canisterId, ledger);
+      const price_usd = await get_token_price_usd(
+        actorIcpswap, canisterId, ledger, { agent }
+      );
       const fee = Number(fee_e8s) / 10 ** decimals;
       const balance = Number(balance_e8s) / 10 ** decimals;
       const balance_usd = balance * price_usd;

@@ -54,7 +54,8 @@ const useFetchTokenData = (
         const price_usd = await get_token_price_usd(
           actorIcpswap,
           token_canister_id,
-          token
+          token,
+          { agent }
         );
 
         return {
