@@ -23,7 +23,7 @@ pub const TEAM_PRINCIPALS: [Account; 3] = [
         subaccount: None,
     },
     // SNS Rewards Canister
-    // 2f5ll-gqaaa-aaaak-qcfuq-cai
+    // 2f5ll-gqaaa-aaaak-qcfuq-cai -
     Account {
         owner: Principal::from_slice(&[0, 0, 0, 0, 1, 80, 17, 105, 1, 1]),
         subaccount: Some([

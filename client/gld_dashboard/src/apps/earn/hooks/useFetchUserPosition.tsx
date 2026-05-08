@@ -17,7 +17,7 @@ import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_poo
 import get_position from "@services/stake/get_position";
 import icrc1_fee from "@services/ledger/icrc1_fee";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
-import { fetch_all_tokens, find_token_price_usd } from "@services/icpswap/get_token_price_usd";
+import get_token_price_usd from "@services/icpswap/get_token_price_usd";
 import { Position, Reward } from "@earn/interfaces";
 
 const useFetchUserPosition = (
@@ -84,11 +84,8 @@ const useFetchUserPosition = (
         const result = result_arr[0];
 
         const decimalsGLDT = await icrc1_decimals(actorLedgerGLDT);
-        const allTokens = await fetch_all_tokens(actorIcpswap);
-        const priceGLDT = find_token_price_usd(
-          allTokens,
-          TOKEN_GLDT.canister_id,
-          TOKEN_GLDT.name
+        const priceGLDT = await get_token_price_usd(
+          actorIcpswap, TOKEN_GLDT.canister_id, TOKEN_GLDT.name, { agent }
         );
 
         const claimable_rewards = result.claimable_rewards.map(
@@ -132,10 +129,8 @@ const useFetchUserPosition = (
             const is_amount_below_fee =
               token_reward.amount <= fee && token_reward.amount > 0n;
 
-            const price_usd = find_token_price_usd(
-              allTokens,
-              token.canister_id,
-              token.name
+            const price_usd = await get_token_price_usd(
+              actorIcpswap, token.canister_id, token.name, { agent }
             );
             const amount = Number(token_reward.amount) / 10 ** decimals;
 

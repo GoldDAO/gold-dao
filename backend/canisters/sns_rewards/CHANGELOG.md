@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.4] - 2026-05-08
+
+#### FIXED
+
+- **Token parsing bug** : Fix the bug with parsing GLDT token while claiming rewards
+
 ### [1.1.3] - 2026-03-30
 
 #### FIXED

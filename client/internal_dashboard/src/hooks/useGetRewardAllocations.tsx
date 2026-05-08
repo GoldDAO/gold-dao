@@ -5,10 +5,10 @@ import {
 } from "@tanstack/react-query";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory as idlFactoryStake } from "../services/gldt_stake/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "../services/kongswap/idlFactory";
-import { KONGSWAP_CANISTER_ID_IC } from "../constants";
+import { idlFactory as idlFactoryIcpswap } from "../services/icpswap/idlFactory";
+import { ICPSWAP_CANISTER_ID } from "../constants";
 import get_daily_analytics from "../services/gldt_stake/get_daily_analytics";
-import swap_amounts from "../services/kongswap/swap_amounts";
+import get_token_price_usd from "../services/icpswap/get_token_price_usd";
 
 export interface TokenReward {
   name: string;
@@ -62,21 +62,18 @@ const useGetRewardAllocations = (
           agent,
           canisterId: canister_id,
         });
-        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+        const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
           agent,
-          canisterId: KONGSWAP_CANISTER_ID_IC,
+          canisterId: ICPSWAP_CANISTER_ID,
         });
 
         const result = await get_daily_analytics(actorStake);
 
         const GLDT_DECIMALS = 8;
 
-        // Get GLDT price once
-        const priceGLDT = await swap_amounts(actorKongswap, {
-          from: "GLDT",
-          to: "ckUSDT",
-          amount: 1n,
-        });
+        const priceGLDT = await get_token_price_usd(
+          actorIcpswap, undefined, "GLDT", { agent }
+        );
 
         const TOKEN_SYMBOLS = ["GOLDAO", "ICP", "OGY"];
 
@@ -90,11 +87,9 @@ const useGetRewardAllocations = (
               data.rewards.map(async ([tokenSymbol, amount]) => {
                 const tokenName = Object.keys(tokenSymbol)[0];
 
-                const price = await swap_amounts(actorKongswap, {
-                  from: tokenName,
-                  to: "ckUSDT",
-                  amount: 1n,
-                });
+                const price_usd = await get_token_price_usd(
+                  actorIcpswap, undefined, tokenName, { agent }
+                );
 
                 // Get token decimals based on symbol
                 let decimals = 8; // Default for most tokens
@@ -108,7 +103,7 @@ const useGetRewardAllocations = (
                   name: tokenName,
                   amount: tokenAmount,
                   amount_e8s: amount,
-                  amount_usd: price.mid_price * tokenAmount,
+                  amount_usd: price_usd * tokenAmount,
                 };
               })
             );
@@ -123,10 +118,10 @@ const useGetRewardAllocations = (
               apy: data.apy,
               staked_gldt,
               staked_gldt_e8s: data.staked_gldt,
-              staked_gldt_usd: priceGLDT.mid_price * staked_gldt,
+              staked_gldt_usd: priceGLDT * staked_gldt,
               weighted_stake,
               weighted_stake_e8s: data.weighted_stake,
-              weighted_stake_usd: priceGLDT.mid_price * weighted_stake,
+              weighted_stake_usd: priceGLDT * weighted_stake,
               rewards,
               total_rewards_usd,
             } satisfies DailyAnalytic;

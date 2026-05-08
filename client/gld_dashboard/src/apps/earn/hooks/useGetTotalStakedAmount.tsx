@@ -56,7 +56,8 @@ const useGetTotalStakedAmount = (
         const price_usd = await get_token_price_usd(
           actorIcpswap,
           TOKEN_GLDT.canister_id,
-          TOKEN_GLDT.name
+          TOKEN_GLDT.name,
+          { agent }
         );
 
         const amount = Number(total_amount_staked) / 10 ** decimals;

@@ -1,24 +1,22 @@
 import { Actor, ActorSubclass, Agent, HttpAgent } from "@dfinity/agent";
 import {
-  CKUSDT_LEDGER_CANISTER_ID,
-  CKUSDT_LEDGER_CANISTER_ID_IC,
   GLDT_LEDGER_CANISTER_ID_IC,
   ICP_LEDGER_CANISTER_ID_IC,
   OGY_LEDGER_CANISTER_ID_IC,
   GOLDAO_LEDGER_CANISTER_ID_IC,
   WTN_LEDGER_CANISTER_ID_IC,
+  CKUSDT_LEDGER_CANISTER_ID_IC,
+  CK_USDC_LEDGER_CANISTER_ID_IC,
   ICPSWAP_GLDT_CKUSDT_POOL_CANISTER_ID_IC,
   ICPSWAP_ICP_CKUSDC_POOL_CANISTER_ID_IC,
   ICPSWAP_OGY_ICP_POOL_CANISTER_ID_IC,
   ICPSWAP_GOLDAO_ICP_POOL_CANISTER_ID_IC,
   ICPSWAP_WTN_ICP_POOL_CANISTER_ID_IC,
-  CK_USDC_LEDGER_CANISTER_ID_IC,
-} from "@constants";
-import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
-import icrc1_decimals from "@services/ledger/icrc1_decimals";
+} from "../../constants";
+import { idlFactory as idlFactoryLedger } from "../ledger/idlFactory";
+import icrc1_decimals from "../ledger/icrc1_decimals";
 
-import { idlFactory as idlFactorySwapFactory } from "./idls/swap_factory";
-import { Result } from "./interfaces/swap_factory";
+import { idlFactory as idlFactorySwapFactory } from "./swap_factory_idlFactory";
 
 export interface PublicTokenOverview {
   id: bigint;
@@ -91,12 +89,16 @@ export const fetch_all_tokens = async (
 
 export const find_token_price_usd = (
   tokens: PublicTokenOverview[],
-  tokenCanisterId: string,
+  tokenCanisterId?: string,
   tokenSymbol?: string
 ): number => {
   const token =
-    tokens.find((t) => t.address === tokenCanisterId) ??
-    (tokenSymbol ? tokens.find((t) => t.symbol === tokenSymbol) : undefined);
+    (tokenCanisterId
+      ? tokens.find((t) => t.address === tokenCanisterId)
+      : undefined) ??
+    (tokenSymbol
+      ? tokens.find((t) => t.symbol === tokenSymbol)
+      : undefined);
   if (!token) {
     throw new Error(
       `Token ${tokenSymbol ?? tokenCanisterId} not found on ICPSwap`
@@ -115,7 +117,7 @@ const quote_swap_pool = async (
     canisterId: swapPoolCanisterId,
   });
 
-  const result = (await actor.quote(options)) as Result;
+  const result = (await actor.quote(options)) as { ok: bigint } | { err: unknown };
 
   if ("err" in result) {
     throw new Error(JSON.stringify(result.err));
@@ -129,7 +131,6 @@ const get_live_quote_price_usd = async (
   tokenCanisterId: string
 ): Promise<number | null> => {
   if (
-    tokenCanisterId === CKUSDT_LEDGER_CANISTER_ID ||
     tokenCanisterId === CKUSDT_LEDGER_CANISTER_ID_IC ||
     tokenCanisterId === CK_USDC_LEDGER_CANISTER_ID_IC
   ) {
@@ -169,13 +170,13 @@ const get_live_quote_price_usd = async (
 
 const get_token_price_usd = async (
   actor: ActorSubclass,
-  tokenCanisterId: string,
+  tokenCanisterId?: string,
   tokenSymbol?: string,
   options: { agent?: Agent | HttpAgent } = {}
 ): Promise<number> => {
   const { agent } = options;
 
-  if (agent) {
+  if (agent && tokenCanisterId) {
     try {
       const livePrice = await get_live_quote_price_usd(agent, tokenCanisterId);
       if (typeof livePrice === "number") {
