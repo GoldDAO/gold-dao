@@ -27,7 +27,9 @@ const TokenHeaderPrice = ({
         agent: unauthenticatedAgent,
         canisterId: ICPSWAP_CANISTER_ID,
       });
-      return get_token_price_usd(actor, token.canister_id, token.name);
+      return get_token_price_usd(actor, token.canister_id, token.name, {
+        agent: unauthenticatedAgent,
+      });
     },
     placeholderData: keepPreviousData,
     enabled: !!unauthenticatedAgent,

@@ -13,6 +13,10 @@ spec:
     sns-controlled:
       description: Whether or not the canister is SNS controlled
       options: ["true", "false"]
+    deploy-to-preprod:
+      description: Whether to generate the preprod deploy job for this frontend. Set to "false" when no preprod canister id is registered.
+      default: "true"
+      options: ["true", "false"]
 ---
 
 # STAGING AND PREPROD DEPLOYMENT
@@ -54,6 +58,8 @@ $[[ inputs.src-folder ]] preprod deploy:
   variables:
     TARGET_NETWORK: preprod
   rules:
+    - if: '"$[[ inputs.deploy-to-preprod ]]" != "true"'
+      when: never
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"

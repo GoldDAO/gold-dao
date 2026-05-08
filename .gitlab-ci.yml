@@ -166,6 +166,7 @@ include:
     inputs:
       src-folder: internal_dashboard
       sns-controlled: "false"
+      deploy-to-preprod: "false"
 
 ################################################################################
 # Cache preparation

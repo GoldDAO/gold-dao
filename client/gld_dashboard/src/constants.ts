@@ -82,6 +82,19 @@ export const SNS_GOVERNANCE_CANISTER_ID_IC = "tr3th-kiaaa-aaaaq-aab6q-cai";
 export const ROOT_ACCOUNT_GLDGOV =
   "tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8";
 export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
+export const CKUSDT_LEDGER_CANISTER_ID_IC = "cngnf-vqaaa-aaaar-qag4q-cai";
+
+// ICPSwap pool canister IDs (mainnet)
+export const ICPSWAP_GLDT_CKUSDT_POOL_CANISTER_ID_IC =
+  "4jnbn-vqaaa-aaaag-qnala-cai";
+export const ICPSWAP_ICP_CKUSDC_POOL_CANISTER_ID_IC =
+  "mohjv-bqaaa-aaaag-qjyia-cai";
+export const ICPSWAP_OGY_ICP_POOL_CANISTER_ID_IC =
+  "ttnzy-lyaaa-aaaag-qj2bq-cai";
+export const ICPSWAP_GOLDAO_ICP_POOL_CANISTER_ID_IC =
+  "k46ek-4qaaa-aaaag-qcyzq-cai";
+export const ICPSWAP_WTN_ICP_POOL_CANISTER_ID_IC =
+  "oqn67-kaaaa-aaaag-qj72q-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
 
 export const GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID =
