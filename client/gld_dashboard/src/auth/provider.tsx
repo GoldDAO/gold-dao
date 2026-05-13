@@ -21,10 +21,13 @@ import {
 } from "@constants";
 import authStateAtom from "./atoms";
 
-// const InternetIdentity2 = {
-//   ...InternetIdentity,
-//   providerUrl: "https://id.ai/",
-// };
+// `@amerej/identitykit` v1.0.15 ships InternetIdentity with an empty providerUrl,
+// so @dfinity/auth-client falls back to the deprecated identity.internetcomputer.org.
+// Point it at id.ai with the guided-upgrade flag so existing II users can migrate.
+const InternetIdentityIdAi = {
+  ...InternetIdentity,
+  providerUrl: "https://id.ai/?feature_flag_guided_upgrade=true",
+};
 
 const AuthProviderInit = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
@@ -83,7 +86,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <IdentityKitProvider
-      signers={[NFIDW, InternetIdentity, OISY]}
+      signers={[NFIDW, InternetIdentityIdAi, OISY]}
       signerClientOptions={{
         targets: [
           SWAP_CANISTER_ID,
