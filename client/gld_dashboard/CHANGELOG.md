@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 #### Fix
 
-- Internet Identity login failing with "Unable to connect" after the migration from `identity.internetcomputer.org` to `id.ai`
+- Internet Identity login failing with `Unable to connect` after the migration from `identity.internetcomputer.org` to `id.ai`
 
 ### [2.3.0] - 2026-04-02
 
