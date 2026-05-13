@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.3.1] - 2026-05-13
+
+#### Fix
+
+- Internet Identity login failing with "Unable to connect" after the migration from `identity.internetcomputer.org` to `id.ai`
+
 ### [2.3.0] - 2026-04-02
 
 #### Changed
