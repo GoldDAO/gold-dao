@@ -48,7 +48,7 @@ fn post_upgrade(args: Args) {
             //                 },
             //             ),
             //         },
-                    
+
             //         SwapCanisterConfig {
             //             icrc7_canister_id: Principal::from_text("qwf5l-cqaaa-aaaad-aapma-cai").unwrap(), //10g
             //             fractionalization_config: FractionalizationConfig::General(

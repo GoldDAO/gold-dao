@@ -4,14 +4,14 @@ use crate::types::ExchangeJobs;
 use bity_ic_canister_state_macros::canister_state;
 use bity_ic_types::BuildVersion;
 use buyback_burn_api::exchange_job_config::ExchangeJobConfig;
+use buyback_burn_api::stake_icp_config::StakeIcpConfig;
 use candid::{CandidType, Principal};
-use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
+use tracing::error;
 use types::{Cycles, TimestampMillis};
 use utils::env::{CanisterEnv, Environment};
 use utils::memory::MemorySize;
-use utils::numeric::Percentage;
 
 canister_state!(RuntimeState);
 
@@ -44,6 +44,7 @@ impl RuntimeState {
             token_swaps_metrics: self.data.token_swaps.get_metrics(),
             icp_swap_canister_id: self.data.icp_swap_canister_id,
             exchange_jobs: self.data.exchange_jobs.clone(),
+            stake_icp_config: self.data.stake_icp_config.clone(),
         }
     }
 }
@@ -59,6 +60,8 @@ pub struct Data {
 
     // storage for swap guard see guards.rs
     pub exchange_job_guards: BTreeSet<u128>,
+
+    pub stake_icp_config: Option<StakeIcpConfig>,
 }
 
 impl Data {
@@ -67,11 +70,19 @@ impl Data {
         authorized_principals: Vec<Principal>,
         icp_swap_canister_id: Principal,
         exchange_configs: Vec<ExchangeJobConfig>,
+        stake_icp_config: Option<StakeIcpConfig>,
     ) -> Self {
         let mut exchange_jobs = ExchangeJobs::init();
 
         for exchange_job_config in exchange_configs {
-            let _ = exchange_jobs.add_exchange_job(exchange_job_config);
+            match exchange_job_config.validate() {
+                Ok(_) => {
+                    let _ = exchange_jobs.add_exchange_job(exchange_job_config);
+                }
+                Err(e) => {
+                    error!("Invalid exchange job config provided during init: {}", e);
+                }
+            }
         }
 
         Self {
@@ -80,6 +91,7 @@ impl Data {
             token_swaps: TokenSwaps::default(),
             exchange_jobs,
             exchange_job_guards: BTreeSet::new(),
+            stake_icp_config,
         }
     }
 }
@@ -91,6 +103,7 @@ pub struct Metrics {
     pub icp_swap_canister_id: Principal,
     pub token_swaps_metrics: TokenSwapsMetrics,
     pub exchange_jobs: ExchangeJobs,
+    pub stake_icp_config: Option<StakeIcpConfig>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]

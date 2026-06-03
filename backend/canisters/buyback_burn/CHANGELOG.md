@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.3.0] - 2026-05-27
+
+#### Added
+
+- **Exchange job constraints**: Buy and burn GOLDAO if the ratio is 1:500 GOLDAO or higher. Buy and stake OGY as long as the ratio is 1:1000 OGY or higher (current is 1:3000). If neither of the above conditions is met, increase the ICP neuron and compound the interest.
+- **Neuron Staking deature**: Added the ClaimOrRefresh call to the governance canister after funds transfer (both NNS and SNS support)
+
+#### Fixed
+
+- **GLDT Buyback Subaccount**: Fixed an issue where the subaccount was reset during previous upgrades and restored it to its correct state.
+
 ### [1.2.1] - 2026-04-16
 
 #### Fixed

@@ -6,6 +6,7 @@ use crate::sns_test_env::sns_test_env::SnsTestEnv;
 use crate::sns_test_env::utils::generate_neuron_data;
 use crate::utils::random_principal;
 use crate::utils::tick_n_blocks;
+use bity_ic_types::BuildVersion;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
@@ -20,7 +21,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::time::Duration;
-use bity_ic_types::BuildVersion;
 use types::CanisterId;
 
 #[derive(CandidType, Deserialize, Debug)]

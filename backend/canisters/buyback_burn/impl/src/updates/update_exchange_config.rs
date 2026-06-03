@@ -5,7 +5,6 @@ pub use buyback_burn_api::update_exchange_config::Args as UpdateExchangeConfigAr
 pub use buyback_burn_api::update_exchange_config::Response as UpdateExchangeConfigResponse;
 use ic_cdk_macros::{query, update};
 
-// TODO: fix validation
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
 async fn update_exchange_config_validate(args: UpdateExchangeConfigArgs) -> Result<String, String> {

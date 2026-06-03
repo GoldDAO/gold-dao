@@ -1,4 +1,5 @@
 use crate::exchange_job_config::ExchangeJobConfig;
+use crate::stake_icp_config::StakeIcpConfig;
 use bity_ic_types::BuildVersion;
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
@@ -11,4 +12,5 @@ pub struct InitArgs {
     pub authorized_principals: Vec<Principal>,
     pub exchange_configs: Vec<ExchangeJobConfig>,
     pub icp_swap_canister_id: Principal,
+    pub stake_icp_config: Option<StakeIcpConfig>,
 }
