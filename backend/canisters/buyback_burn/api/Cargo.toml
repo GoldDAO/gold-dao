@@ -17,3 +17,7 @@ icrc-ledger-types = { workspace = true }
 ic-stable-structures = { workspace = true }
 utils = { path = '../../../libraries/utils' }
 bity-ic-types = { workspace = true }
+ic-cdk = { workspace = true }
+sns_governance_canister_c2c_client = { path = "../../../external_canisters/sns_governance/c2c_client" }
+sns_governance_canister = { path = "../../../external_canisters/sns_governance/api" }
+tracing = { workspace = true }

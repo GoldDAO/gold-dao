@@ -1,6 +1,6 @@
-use candid::Principal;
 use bity_ic_canister_time::DAY_IN_MS;
 use bity_ic_canister_time::HOUR_IN_MS;
+use candid::Principal;
 use lazy_static::lazy_static;
 use pocket_ic::PocketIc;
 use rand::{thread_rng, RngCore};

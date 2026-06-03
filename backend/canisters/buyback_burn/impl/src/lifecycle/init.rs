@@ -23,6 +23,7 @@ fn init(args: Args) {
                 init_args.authorized_principals,
                 init_args.icp_swap_canister_id,
                 init_args.exchange_configs,
+                init_args.stake_icp_config,
             );
 
             if init_args.test_mode {

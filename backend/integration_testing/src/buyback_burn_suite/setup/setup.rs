@@ -88,10 +88,16 @@ impl TestEnvBuilder {
                 min_amount: Tokens::from_e8s(0),
                 max_amount: Some(Tokens::from_e8s(0)),
                 destination_account: None,
+                constraints: vec![
+                    buyback_burn_api::swap_constraint::SwapConstraint::MaxSellRatio(500),
+                    buyback_burn_api::swap_constraint::SwapConstraint::MinSellRatio(100),
+                ],
+                post_transfer_action: None,
             }],
             icp_swap_canister_id: Principal::from_text("7eikv-2iaaa-aaaag-qdgwa-cai").unwrap(),
             commit_hash: "".to_string(),
             authorized_principals: vec![self.controller.clone()],
+            stake_icp_config: None,
         });
 
         let buyback_burn_canister_id = setup_buyback_burn_canister(

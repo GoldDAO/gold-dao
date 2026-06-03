@@ -23,6 +23,8 @@ pub const OGY_LEDGER_CANISTER_ID_STAGING: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 1, 80, 17, 179, 1, 1]);
 pub const OGY_LEDGER_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 1, 32, 0, 185, 1, 1]);
+pub const OGY_GOVERNANCE_CANISTER_ID: CanisterId =
+    Principal::from_slice(&[0, 0, 0, 0, 2, 0, 0, 206, 1, 1]);
 pub const SNS_LEDGER_CANISTER_ID_STAGING: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 1, 224, 14, 185, 1, 1]);
 pub const GOLD_1G_CANISTER_ID: CanisterId =
@@ -39,6 +41,10 @@ pub const GOLD_1000G_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 1, 128, 10, 88, 1, 1]);
 pub const ICPSWAP_TOKEN_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 0, 208, 18, 203, 1, 1]);
+pub const ICP_NEURON_CANISTER_ID: CanisterId =
+    Principal::from_slice(&[0, 0, 0, 0, 1, 224, 14, 182, 1, 1]);
+pub const SNS_NEURON_CONTROLLER_CANISTER_ID: CanisterId =
+    Principal::from_slice(&[0, 0, 0, 0, 1, 224, 60, 34, 1, 1]);
 
 pub const E8S_PER_OGY: u64 = 100_000_000;
 pub const E8S_FEE_OGY: u64 = 200_000;
@@ -126,6 +132,7 @@ mod tests {
             Principal::from_text("kfsak-7aaaa-aaaak-qcgzq-cai").unwrap()
         )
     }
+
     #[test]
     fn ogy_ledger_canister_id_prod() {
         assert_eq!(
@@ -133,6 +140,7 @@ mod tests {
             Principal::from_text("jwcfb-hyaaa-aaaaj-aac4q-cai").unwrap()
         )
     }
+
     #[test]
     fn gold_1g_canister_id() {
         assert_eq!(
@@ -186,6 +194,22 @@ mod tests {
         assert_eq!(
             ICPSWAP_TOKEN_CANISTER_ID,
             Principal::from_text("moe7a-tiaaa-aaaag-qclfq-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn icp_neuron_canister_id() {
+        assert_eq!(
+            ICP_NEURON_CANISTER_ID,
+            Principal::from_text("j4jiq-sqaaa-aaaap-ab23a-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn sns_neuron_controller_canister_id() {
+        assert_eq!(
+            SNS_NEURON_CONTROLLER_CANISTER_ID,
+            Principal::from_text("54vkq-taaaa-aaaap-ahqra-cai").unwrap()
         );
     }
 }
