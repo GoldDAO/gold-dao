@@ -4,6 +4,7 @@ use bity_ic_canister_tracing_macros::trace;
 pub use buyback_burn_api::add_exchange_jobs::Args as AddExchangeJobArgs;
 pub use buyback_burn_api::add_exchange_jobs::Response as AddExchangeJobResponse;
 use ic_cdk_macros::{query, update};
+use tracing::error;
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
@@ -26,10 +27,17 @@ fn add_exchange_jobs_impl(
     state: &mut RuntimeState,
 ) -> AddExchangeJobResponse {
     for exchange_job_config in args.exchange_configs {
-        let _ = state
-            .data
-            .exchange_jobs
-            .add_exchange_job(exchange_job_config);
+        match exchange_job_config.validate() {
+            Ok(_) => {
+                let _ = state
+                    .data
+                    .exchange_jobs
+                    .add_exchange_job(exchange_job_config);
+            }
+            Err(e) => {
+                error!("Invalid exchange job config provided during init: {}", e);
+            }
+        }
     }
 
     AddExchangeJobResponse::Success

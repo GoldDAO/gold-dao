@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::types::GOLDAO_BURNING_POOL;
 use crate::utils::retry_with_attempts;
 use crate::utils::{get_token_balance, RETRY_DELAY};
@@ -13,8 +11,9 @@ use types::TokenSymbol;
 
 const MAX_ATTEMPTS: u8 = 1;
 
-pub fn run_once() {
-    ic_cdk_timers::set_timer(Duration::ZERO, run);
+pub fn start_job() {
+    // NOTE: 12 UTC
+    start_job_daily_at(12, run);
 }
 
 pub fn run() {

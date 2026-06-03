@@ -8,7 +8,7 @@ use bity_ic_canister_time::NANOS_PER_MILLISECOND;
 use bity_ic_canister_tracing_macros::trace;
 use candid::Nat;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::debug;
+use std::time::Duration;
 use tracing::{error, info};
 use utils::env::Environment;
 use utils::rand::generate_random_delay;
@@ -18,27 +18,122 @@ const MAX_ATTEMPTS: u8 = 1;
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
 pub fn start_job() {
-    // We only need the keys and the intervals to initialize the timers
-    let exchange_jobs = read_state(|s| s.data.exchange_jobs.exchange_jobs.clone());
+    let unconstrained_jobs = read_state(|s| {
+        let jobs: Vec<_> = s
+            .data
+            .exchange_jobs
+            .exchange_jobs
+            .values()
+            .filter(|j| j.constraints.is_empty())
+            .cloned()
+            .collect();
+        jobs
+    });
 
-    for (job_id, exchange_job) in exchange_jobs {
+    // Step 1: start one independent timer per unconstrained job (GLDT)
+    for job in unconstrained_jobs {
+        let job_id = job.id;
         info!(
-            "Starting token swap job ID: {:?} for exchange: {:?} with interval: {:?}",
-            job_id, exchange_job.exchange, exchange_job.job_interval
+            "Starting unconstrained swap job ID: {} for exchange: {:?} with interval: {:?}",
+            job_id, job.exchange, job.job_interval
         );
-
-        let interval = exchange_job.job_interval;
-
-        let timer_id = run_now_then_interval_with_args(interval, move || {
-            run(job_id);
-        });
-
-        mutate_state(|state| {
-            if let Some(job) = state.data.exchange_jobs.exchange_jobs.get_mut(&job_id) {
-                job.timer_id = Some(timer_id);
+        let timer_id = run_now_then_interval_with_args(job.job_interval, move || run(job_id));
+        mutate_state(|s| {
+            if let Some(j) = s.data.exchange_jobs.exchange_jobs.get_mut(&job_id) {
+                j.timer_id = Some(timer_id);
             }
-            info!("Timer saved into state for job ID: {:?}", job_id);
         });
+    }
+
+    // Steps 2 & 3: single timer that checks constrained jobs in priority order,
+    // falling back to staking ICP if none of their quotes pass.
+    let constrained_jobs_interval = read_state(|s| {
+        s.data
+            .stake_icp_config
+            .as_ref()
+            .map(|c| Duration::from_millis(c.job_interval_ms))
+    });
+    let Some(interval) = constrained_jobs_interval else {
+        info!("No StakeIcpConfig found, skipping constrained swap + stake_icp job.");
+        return;
+    };
+    run_now_then_interval_with_args(interval, || {
+        ic_cdk::futures::spawn(run_constrained_jobs_then_stake_icp())
+    });
+}
+
+async fn run_constrained_jobs_then_stake_icp() {
+    let interval = read_state(|s| {
+        s.data
+            .stake_icp_config
+            .as_ref()
+            .map(|c| Duration::from_millis(c.job_interval_ms))
+    });
+    let Some(interval) = interval else { return };
+
+    let delay = match generate_random_delay(interval).await {
+        Ok(d) => d,
+        Err(e) => {
+            error!("Failed to generate random delay: {}", e);
+            return;
+        }
+    };
+
+    ic_cdk_timers::set_timer(delay, || {
+        ic_cdk::futures::spawn(async {
+            // run constrained jobs in ascending ID order (smaller ID = higher priority).
+            let mut constrained_jobs: Vec<ExchangeJob> = read_state(|s| {
+                s.data
+                    .exchange_jobs
+                    .exchange_jobs
+                    .values()
+                    .filter(|j| !j.constraints.is_empty())
+                    .cloned()
+                    .collect()
+            });
+            constrained_jobs.sort_by_key(|j| j.id);
+
+            for job in constrained_jobs {
+                let input_token_info = job.exchange.get_config().input_token.get_prod_token_info();
+                let nominal_sell: u128 = 100_000_000; // 1 ICP in e8s — ratio check only
+                let quote = get_swap_quote(&job.exchange, nominal_sell, input_token_info.fee).await;
+
+                if job
+                    .constraints
+                    .iter()
+                    .all(|c| c.check_quote(nominal_sell, quote))
+                {
+                    info!(
+                        "Constrained job {} quote passed (sell={}, buy={}), running swap.",
+                        job.id, nominal_sell, quote
+                    );
+                    run_swap_job(job).await;
+                    return; // exclusive: skip lower-priority jobs and stake ICP
+                }
+
+                info!(
+                    "Constrained job {} quote not satisfied (sell={}, buy={}), trying next.",
+                    job.id, nominal_sell, quote
+                );
+            }
+
+            // Step 3: no constrained job ran — stake ICP as fallback.
+            info!("No constrained swap conditions met, staking ICP.");
+            crate::jobs::stake_icp::stake_icp().await;
+        })
+    });
+}
+
+async fn run_swap_job(job: ExchangeJob) {
+    if let Some((future, token_swap_id)) = create_token_swap_if_possible(job.clone()).await {
+        if future.await.is_ok() {
+            let _ = mutate_state(|s| s.data.token_swaps.archive_swap(token_swap_id));
+            if let Err(e) = transfer_to_destination(&job).await {
+                error!("Failed to transfer to destination: {}", e);
+            }
+        } else {
+            error!("Failed to process token swap for job {:?}", job);
+        }
     }
 }
 
@@ -59,10 +154,6 @@ async fn run_async_with_rand_delay(exchange_job_id: u128) {
     if let Some(job_interval) = interval {
         match generate_random_delay(job_interval).await {
             Ok(random_delay) => {
-                debug!(
-                    "Scheduling token swap job after random delay of {:?}",
-                    random_delay
-                );
                 ic_cdk_timers::set_timer(random_delay, move || {
                     ic_cdk::futures::spawn(run_async(exchange_job_id))
                 });
@@ -88,25 +179,13 @@ async fn run_async(exchange_job_id: u128) {
     });
 
     info!(
-        "Running token swap job for exchange: {:?}",
+        "Running unconstrained swap job for exchange: {:?}",
         exchange_job.exchange
     );
-
-    if let Some((future, token_swap_id)) = create_token_swap_if_possible(exchange_job.clone()).await
-    {
-        if future.await.is_ok() {
-            let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
-
-            if let Err(e) = transfer_to_destination(&exchange_job).await {
-                error!("Failed to transfer to destination: {}", e);
-            }
-        } else {
-            error!("Failed to process token swap for job {:?}", exchange_job);
-        }
-    };
+    run_swap_job(exchange_job).await;
 }
 
-async fn transfer_to_destination(exchange_job: &ExchangeJob) -> Result<Nat, String> {
+pub(crate) async fn transfer_to_destination(exchange_job: &ExchangeJob) -> Result<Nat, String> {
     let Some(destination_account) = exchange_job.destination_account else {
         return Ok(Nat::from(0_u64));
     };
@@ -158,12 +237,18 @@ async fn transfer_to_destination(exchange_job: &ExchangeJob) -> Result<Nat, Stri
             );
             Err(format!("{:?}", error))
         }
-    };
+    }?;
 
-    transfer_result
+    if let Some(action) = &exchange_job.post_transfer_action {
+        if let Err(e) = action.execute_post_transfer_action().await {
+            error!("Post-transfer action failed: {}", e);
+        }
+    }
+
+    Ok(transfer_result)
 }
 
-async fn create_token_swap_if_possible(
+pub(crate) async fn create_token_swap_if_possible(
     exchange_job: ExchangeJob,
 ) -> Option<(impl std::future::Future<Output = Result<(), String>>, u128)> {
     let _guard_exchange_job =
@@ -205,7 +290,32 @@ async fn create_token_swap_if_possible(
         u128::try_from(exchange_job.rate_per_interval.apply_to(&available_amount).0)
             .expect("Failed to convert Nat");
 
+    if amount_to_dex <= input_token_info.fee as u128 {
+        error!(
+            "Amount to swap ({}) is too small to cover fee ({}) for job {}, skipping.",
+            amount_to_dex, input_token_info.fee, exchange_job.id
+        );
+        return None;
+    }
+
+    let amount_to_dex = amount_to_dex - input_token_info.fee as u128;
+    info!(
+        "Amount to swap for job {}: {}",
+        exchange_job.id, amount_to_dex
+    );
+
     let quote = get_swap_quote(&swap_client, amount_to_dex, input_token_info.fee).await;
+
+    for constraint in &exchange_job.constraints {
+        if !constraint.check_quote(amount_to_dex, quote) {
+            info!(
+                "Swap rejected by constraint {:?}: sell={}, buy={}",
+                constraint, amount_to_dex, quote
+            );
+            return None;
+        }
+    }
+
     let min_required = (exchange_job.min_amount.e8s() as u128) + (output_token_info.fee as u128);
 
     if let Some(max_amount) = exchange_job.max_amount {

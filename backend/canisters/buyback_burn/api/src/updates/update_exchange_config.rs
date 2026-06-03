@@ -1,3 +1,5 @@
+use crate::exchange_job_config::validate_constraints;
+use crate::swap_constraint::SwapConstraint;
 use candid::CandidType;
 use ic_ledger_types::Tokens;
 use icrc_ledger_types::icrc1::account::Account;
@@ -13,6 +15,7 @@ pub struct Args {
     pub min_amount: Option<Tokens>,
     pub max_amount: Option<Option<Tokens>>,
     pub destination_account: Option<Option<Account>>,
+    pub constraints: Option<Vec<SwapConstraint>>,
 }
 
 impl Args {
@@ -33,6 +36,10 @@ impl Args {
             if min >= max {
                 return Err("New min_amount must be less than the new max_amount".to_string());
             }
+        }
+
+        if let Some(constraints) = &self.constraints {
+            validate_constraints(constraints)?;
         }
 
         Ok(())
