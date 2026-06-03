@@ -39,5 +39,6 @@ types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
 async-trait = { workspace = true }
 futures = { workspace = true }
+ic-ledger-types = { workspace = true }
 enum_dispatch = { workspace = true }
 bity-ic-types = { workspace = true }

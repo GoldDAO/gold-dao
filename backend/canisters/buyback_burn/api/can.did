@@ -1,19 +1,24 @@
 type Account = record { owner : principal; subaccount : opt blob };
-type Args = record {
+type Args = record { exchange_configs : vec ExchangeJobConfig };
+type Args_1 = record {
   destination_account : opt opt Account;
   source_subaccount : opt opt blob;
+  constraints : opt vec SwapConstraint;
   min_amount : opt Tokens;
   exchange_job_id : nat;
   job_interval_ms : opt nat64;
   rate_per_interval : opt nat64;
   max_amount : opt opt Tokens;
 };
-type Args_1 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_2 = record { config : opt StakeIcpConfig };
+type Args_3 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type ExchangeConfig = variant { ICPSwap : ICPSwapConfig };
 type ExchangeJobConfig = record {
   destination_account : opt Account;
   source_subaccount : opt blob;
+  constraints : vec SwapConstraint;
+  post_transfer_action : opt PostTransferAction;
   min_amount : Tokens;
   job_interval_ms : nat64;
   rate_per_interval : nat64;
@@ -30,17 +35,39 @@ type InitArgs = record {
   test_mode : bool;
   exchange_configs : vec ExchangeJobConfig;
   icp_swap_canister_id : principal;
+  stake_icp_config : opt StakeIcpConfig;
   authorized_principals : vec principal;
   version : BuildVersion;
   commit_hash : text;
 };
-type Response = variant { Success; InvalidBurnRate };
+type PostTransferAction = variant {
+  SnsClaimOrRefresh : record {
+    neuron_subaccount : blob;
+    governance_canister_id : principal;
+  };
+};
+type Response = variant { Success };
+type Response_1 = variant { Success; InvalidBurnRate };
+type Response_2 = variant { ValidationError : text; Success };
 type Result = variant { Ok : Account; Err : text };
 type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
 type Result_3 = variant { Ok : Result_2; Err : text };
 type Result_4 = variant { Ok : nat64; Err : text };
+type StakeIcpConfig = record {
+  destination_account : Account;
+  min_amount : nat64;
+  job_interval_ms : nat64;
+  rate_per_interval : nat64;
+  neuron_id : nat64;
+};
 type SupportedStandard = record { url : text; name : text };
+type SwapConstraint = variant {
+  MaxBuyRatio : nat64;
+  MinSellRatio : nat64;
+  MinBuyRatio : nat64;
+  MaxSellRatio : nat64;
+};
 type TokenSwap = record {
   started : nat64;
   deposit_account : opt Result;
@@ -56,9 +83,11 @@ type TokenSwap = record {
 type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO; GLDT };
 type Tokens = record { e8s : nat64 };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
-service : (Args_1) -> {
+service : (Args_3) -> {
+  add_exchange_jobs : (Args) -> (Response);
   get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
   get_swap : (nat) -> (opt TokenSwap) query;
   icrc10_supported_standards : () -> (vec SupportedStandard) query;
-  update_exchange_config : (Args) -> (Response);
+  update_exchange_config : (Args_1) -> (Response_1);
+  update_stake_icp_config : (Args_2) -> (Response_2);
 }

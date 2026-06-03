@@ -2,7 +2,9 @@ use crate::types::SwapClientEnum;
 use crate::utils::run_now_then_interval_with_args;
 use crate::UpdateExchangeConfigArgs;
 use buyback_burn_api::exchange_job_config::ExchangeJobConfig;
+use buyback_burn_api::post_transfer_action::PostTransferAction;
 use buyback_burn_api::swap_config::SwapConfig;
+use buyback_burn_api::swap_constraint::SwapConstraint;
 use ic_cdk_timers::TimerId;
 use ic_ledger_types::Tokens;
 use icrc_ledger_types::icrc1::account::Account;
@@ -32,11 +34,14 @@ pub struct ExchangeJob {
     pub min_amount: Tokens,                    // in token that is bought
     pub max_amount: Option<Tokens>,
     pub destination_account: Option<Account>,
+    pub constraints: Vec<SwapConstraint>,
+    pub post_transfer_action: Option<PostTransferAction>,
 }
 
 impl TryFrom<(u128, ExchangeJobConfig)> for ExchangeJob {
     type Error = String;
 
+    // NOTE: is gonna be used for GLDT job
     fn try_from((exchange_job_id, config): (u128, ExchangeJobConfig)) -> Result<Self, Self::Error> {
         Ok(Self {
             id: exchange_job_id,
@@ -53,6 +58,8 @@ impl TryFrom<(u128, ExchangeJobConfig)> for ExchangeJob {
             min_amount: config.min_amount,
             max_amount: config.max_amount,
             destination_account: config.destination_account,
+            constraints: config.constraints,
+            post_transfer_action: config.post_transfer_action,
         })
     }
 }
@@ -85,6 +92,17 @@ impl ExchangeJobs {
 
         info!("Added exchange job {}", id);
         Ok(())
+    }
+
+    // Stores the job in state without starting a timer.
+    // Used for jobs driven by an external orchestrating job
+    pub fn add_exchange_job_no_timer(&mut self, config: ExchangeJobConfig) -> Result<u128, String> {
+        let id = self.get_next_id();
+        let job: ExchangeJob = (id, config).try_into()?;
+        self.exchange_jobs.insert(id, job);
+        self.last_used_id = id;
+        info!("Added exchange job {} (no timer)", id);
+        Ok(id)
     }
 
     pub fn remove_exchange_job(&mut self, exchange_job_id: u128) -> Result<(), String> {
