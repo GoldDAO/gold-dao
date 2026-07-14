@@ -17,6 +17,7 @@ type Command = variant {
   Spawn : Spawn;
   Split : Split;
   Follow : Follow;
+  RefreshVotingPower : record {};
   ClaimOrRefresh : ClaimOrRefresh;
   Configure : Configure;
   RegisterVote : RegisterVote;
@@ -46,8 +47,17 @@ type Follow = record { topic : int32; followees : vec NeuronId };
 type IncreaseDissolveDelay = record {
   additional_dissolve_delay_seconds : nat32;
 };
-type InitArgs = record { test_mode : bool; commit_hash : text };
+type InitArgs = record {
+  test_mode : bool;
+  version : BuildVersion;
+  commit_hash : text;
+};
 type ListNeuronsResponse = record { neurons : NeuronList };
+type ManageCycleManagementAccountResponse = variant {
+  Success;
+  InternalError : text;
+};
+type ManageCycleManagementRequest = record { account_identifier : vec text };
 type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
 type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };
 type ManageRewardRecipientsRequest = record { list : vec RewardsRecipient };
@@ -64,6 +74,7 @@ type NeuronList = record {
 type NeuronWithMetric = record {
   id : nat64;
   dissolve_delay : nat64;
+  voting_power_refreshed_timestamp_seconds : opt nat64;
   maturity : nat64;
   staked_amount : nat64;
   deposit_account : opt DepositAccount;
@@ -76,6 +87,7 @@ type Operation = variant {
   StopDissolving : record {};
   StartDissolving : record {};
   IncreaseDissolveDelay : IncreaseDissolveDelay;
+  SetVisibility : SetVisibility;
   JoinCommunityFund : record {};
   LeaveCommunityFund : record {};
   SetDissolveTimestamp : SetDissolveTimestamp;
@@ -88,6 +100,7 @@ type RewardsRecipient = record {
   account : Account;
 };
 type SetDissolveTimestamp = record { dissolve_timestamp_seconds : nat64 };
+type SetVisibility = record { visibility : opt int32 };
 type Spawn = record {
   percentage_to_spawn : opt nat32;
   new_controller : opt principal;
@@ -96,9 +109,14 @@ type Spawn = record {
 type Split = record { amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
 type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
+type SupportedStandard = record { url : text; name : text };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args) -> {
+  icrc10_supported_standards : () -> (vec SupportedStandard) query;
   list_neurons : () -> (ListNeuronsResponse) query;
+  manage_cycle_management_account : (ManageCycleManagementRequest) -> (
+      ManageCycleManagementAccountResponse,
+    );
   manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);
   manage_reward_recipients : (ManageRewardRecipientsRequest) -> (
       ManageRewardRecipientsResponse,
