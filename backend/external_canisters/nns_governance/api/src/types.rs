@@ -141,6 +141,7 @@ pub mod manage_neuron {
             JoinCommunityFund(JoinCommunityFund),
             LeaveCommunityFund(LeaveCommunityFund),
             ChangeAutoStakeMaturity(ChangeAutoStakeMaturity),
+            SetVisibility(SetVisibility),
         }
     }
 
@@ -696,54 +697,9 @@ pub struct AccountIdentifier {
     pub hash: Vec<u8>,
 }
 
-// impl TryFrom<ProposalInfo> for types::Proposal {
-//     type Error = String;
-
-//     fn try_from(value: ProposalInfo) -> Result<Self, Self::Error> {
-//         types::NnsProposal::try_from(value).map(types::Proposal::NNS)
-//     }
-// }
-
-// impl TryFrom<ProposalInfo> for types::NnsProposal {
-//     type Error = String;
-
-//     fn try_from(p: ProposalInfo) -> Result<Self, Self::Error> {
-//         let now = bity_ic_canister_time::timestamp_millis();
-//         let proposal = p.proposal.ok_or("proposal not set".to_string())?;
-
-//         Ok(types::NnsProposal {
-//             id: p.id.ok_or("id not set".to_string())?.id,
-//             topic: p.topic,
-//             proposer: p.proposer.ok_or("proposer not set".to_string())?.id,
-//             created: p.proposal_timestamp_seconds * 1000,
-//             title: proposal.title.ok_or("title not set".to_string())?,
-//             summary: proposal.summary,
-//             url: proposal.url,
-//             status: p.status.try_into().map_err(|s| format!("unknown status: {s}"))?,
-//             reward_status: p
-//                 .reward_status
-//                 .try_into()
-//                 .map_err(|r| format!("unknown reward status: {r}"))?,
-//             tally: p.latest_tally.map(|t| t.into()).unwrap_or_default(),
-//             deadline: p
-//                 .deadline_timestamp_seconds
-//                 .map(|ts| ts * 1000)
-//                 .ok_or("deadline not set".to_string())?,
-//             payload_text_rendering: proposal
-//                 .action
-//                 .map(|a| serde_json::to_string_pretty(&a).unwrap_or("Failed to serialize payload".to_string())),
-//             last_updated: now,
-//         })
-//     }
-// }
-
-// impl From<Tally> for types::Tally {
-//     fn from(value: Tally) -> types::Tally {
-//         types::Tally {
-//             yes: value.yes,
-//             no: value.no,
-//             total: value.total,
-//             timestamp: value.timestamp_seconds * 1000,
-//         }
-//     }
-// }
+#[derive(
+    candid::CandidType, candid::Deserialize, serde::Serialize, Clone, PartialEq, Debug, Default,
+)]
+pub struct SetVisibility {
+    pub visibility: Option<i32>,
+}
