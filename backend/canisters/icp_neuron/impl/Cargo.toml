@@ -14,6 +14,7 @@ crate-type = ["cdylib"]
 inttest = []
 
 [dependencies]
+futures = { workspace = true }
 candid = { workspace = true }
 bity-ic-canister-logger = { workspace = true }
 bity-ic-canister-state-macros = { workspace = true }
