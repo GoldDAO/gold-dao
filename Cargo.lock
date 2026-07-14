@@ -2301,6 +2301,7 @@ dependencies = [
  "bity-ic-stable-memory",
  "bity-ic-types",
  "candid 0.10.17",
+ "futures",
  "getrandom 0.2.16",
  "hex",
  "http_request",
