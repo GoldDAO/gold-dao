@@ -82,6 +82,14 @@ impl TokenSwaps {
         }
     }
 
+    pub fn archive_active_swaps(&mut self) -> Result<(), String> {
+        let swap_ids: Vec<u128> = self.swaps.keys().cloned().collect();
+        for &swap_id in &swap_ids {
+            self.archive_swap(swap_id)?;
+        }
+        Ok(())
+    }
+
     pub fn get_active_swaps(&self) -> Response {
         self.swaps.clone()
     }
