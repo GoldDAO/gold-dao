@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.5] - 2026-06-20
+
+#### Changed
+
+- **GOLDAO fee**: Updated the GOLDAO fee value
+
 ### [1.1.4] - 2026-05-08
 
 #### FIXED
