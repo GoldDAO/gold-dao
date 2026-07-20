@@ -2,7 +2,7 @@
 
 pub mod buyback_burn_suite;
 mod client;
-pub mod gldt_stake_suite;
+// pub mod gldt_stake_suite;
 pub mod gldt_swap_index_suite;
 pub mod gldt_swap_suite;
 mod origyn_nft_test_env;

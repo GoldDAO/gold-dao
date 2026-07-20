@@ -511,7 +511,7 @@ pub(crate) async fn process_token_swap(
         }
     };
 
-    let (successful_swap, amount_out) = if let Ok(amount_swapped) = swap_result {
+    let (successful_swap, _amount_out) = if let Ok(amount_swapped) = swap_result {
         (
             true,
             amount_swapped.saturating_sub(output_token_info.fee.into()),
@@ -525,7 +525,7 @@ pub(crate) async fn process_token_swap(
 
     // Withdraw tokens from the DEX
     if extract_result(&token_swap.withdrawn_from_dex_at).is_none() {
-        if let Err(error) = swap_client.withdraw(successful_swap, amount_out).await {
+        if let Err(error) = swap_client.withdraw(successful_swap).await {
             let msg = format!("{error:?}");
             mutate_state(|state| {
                 token_swap.withdrawn_from_dex_at = Some(Err(msg.clone()));
@@ -535,7 +535,7 @@ pub(crate) async fn process_token_swap(
             return Err(msg);
         } else {
             mutate_state(|state| {
-                token_swap.withdrawn_from_dex_at = Some(Ok(amount_out));
+                token_swap.withdrawn_from_dex_at = Some(Ok(ic_cdk::api::time().into()));
                 token_swap.success = Some(successful_swap);
                 state.data.token_swaps.upsert(token_swap);
             });
