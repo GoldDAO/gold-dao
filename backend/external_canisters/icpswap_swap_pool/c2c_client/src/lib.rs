@@ -3,6 +3,7 @@ use icpswap_swap_pool_canister::*;
 
 // Queries
 generate_candid_c2c_call!(quote);
+generate_candid_c2c_call!(unused_balances);
 
 // Updates
 generate_candid_c2c_call!(deposit);
