@@ -3,6 +3,7 @@ use crate::types::SwapConfig;
 use anyhow::Result;
 use async_trait::async_trait;
 use candid::CandidType;
+use candid::Nat;
 use enum_dispatch::enum_dispatch;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
@@ -20,7 +21,7 @@ pub trait SwapClient {
     async fn deposit_account(&self) -> Result<Account>;
     async fn deposit(&self, amount: u128) -> Result<()>;
     async fn swap(&self, amount: u128, min_amount_out: u128) -> Result<Result<u128, String>>;
-    async fn withdraw(&self, successful_swap: bool, amount: u128) -> Result<u128>;
+    async fn withdraw(&self, successful_swap: bool) -> Result<u128>;
 }
 
 impl Clone for Box<dyn SwapClient> {

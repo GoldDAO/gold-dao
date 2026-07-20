@@ -88,15 +88,51 @@ impl ICPSwapClient {
         }
     }
 
-    pub async fn withdraw(&self, successful_swap: bool, amount: u128) -> Result<u128> {
+    pub async fn withdraw(&self, successful_swap: bool) -> Result<u128> {
         let token = if successful_swap {
             self.output_token()
         } else {
             self.input_token()
         };
+
+        // Query the unused balance for our canister from the swap pool using C2C client
+        let balance = match icpswap_swap_pool_canister_c2c_client::getUserUnusedBalance(
+            self.swap_canister_id,
+            &self.this_canister_id,
+        )
+        .await?
+        {
+            icpswap_swap_pool_canister::ICPSwapResult::Ok(unused_balance) => {
+                if successful_swap {
+                    if self.zero_for_one {
+                        unused_balance.balance1
+                    } else {
+                        unused_balance.balance0
+                    }
+                } else {
+                    if self.zero_for_one {
+                        unused_balance.balance0
+                    } else {
+                        unused_balance.balance1
+                    }
+                }
+            }
+            icpswap_swap_pool_canister::ICPSwapResult::Err(error) => {
+                return Err(anyhow::anyhow!(
+                    "Failed to query unused balance from pool: {:?}",
+                    error
+                ));
+            }
+        };
+
+        if balance == 0_u64 {
+            // Nothing to withdraw
+            return Ok(0);
+        }
+
         let args = icpswap_swap_pool_canister::withdraw::Args {
             token: token.get_prod_token_info().ledger_id.to_string(),
-            amount: amount.into(),
+            amount: balance,
             fee: token.get_prod_token_info().fee.into(),
         };
         match icpswap_swap_pool_canister_c2c_client::withdraw(self.swap_canister_id, &args).await? {
