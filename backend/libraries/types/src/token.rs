@@ -76,7 +76,7 @@ impl TokenSymbol {
             fee: match self {
                 TokenSymbol::ICP => 10_000,
                 TokenSymbol::OGY => 200_000,
-                TokenSymbol::GOLDAO => 100_000,
+                TokenSymbol::GOLDAO => 1_000_000_000,
                 TokenSymbol::WTN => 1_000_000,
                 TokenSymbol::GLDT => 10_000_000,
             },
@@ -90,7 +90,7 @@ impl TokenSymbol {
             fee: match self {
                 TokenSymbol::ICP => 10_000,
                 TokenSymbol::OGY => 200_000,
-                TokenSymbol::GOLDAO => 100_000,
+                TokenSymbol::GOLDAO => 1_000_000_000,
                 TokenSymbol::WTN => 1_000_000,
                 TokenSymbol::GLDT => 10_000_000,
             },
@@ -111,9 +111,9 @@ impl TokenSymbol {
                 .expect("Invalid test OGY ledger principal"),
 
             (TokenSymbol::GOLDAO, false) => Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai")
-                .expect("Invalid GLDGov ledger principal"),
+                .expect("Invalid GOLDAO ledger principal"),
             (TokenSymbol::GOLDAO, true) => Principal::from_text("irhm6-5yaaa-aaaap-ab24q-cai")
-                .expect("Invalid test GLDGov ledger principal"),
+                .expect("Invalid test GOLDAO ledger principal"),
 
             (TokenSymbol::WTN, false) => Principal::from_text("jcmow-hyaaa-aaaaq-aadlq-cai")
                 .expect("Invalid WTN ledger principal"),
