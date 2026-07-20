@@ -96,7 +96,7 @@ impl ICPSwapClient {
         };
 
         // Query the unused balance for our canister from the swap pool using C2C client
-        let balance = match icpswap_swap_pool_canister_c2c_client::unused_balances(
+        let balance = match icpswap_swap_pool_canister_c2c_client::getUserUnusedBalance(
             self.swap_canister_id,
             &self.this_canister_id,
         )
