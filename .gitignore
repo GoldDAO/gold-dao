@@ -28,3 +28,6 @@ console.log
 proptest-regressions
 .cursor/
 backend/canisters/gldt_stake/api/declarations.zip
+.claude
+AGENTS.md
+skills-lock.json

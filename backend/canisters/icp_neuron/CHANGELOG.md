@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.6] - 2026-09-08
+
+- Spawn the maturity of ICP neurons without stake (leftover voting rewards of the six neurons that were merged into neuron 7446549063176501841). The spawned neurons are disbursed by the regular daily job.
+
 ### [1.1.5] - 2026-07-14
 
 - Set neuron's visibility to public
