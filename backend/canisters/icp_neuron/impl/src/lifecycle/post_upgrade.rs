@@ -6,8 +6,12 @@ use bity_ic_canister_logger::LogEntry;
 use bity_ic_canister_tracing_macros::trace;
 use bity_ic_stable_memory::get_reader;
 use ic_cdk_macros::post_upgrade;
+use ic_ledger_types::AccountIdentifier;
 use icp_neuron_api_canister::Args;
 use tracing::info;
+
+const CYCLE_MANAGEMENT_ACCOUNT: &str =
+    "a51ceabd4d86c16c94936db0422d9b814b4f20e58fa013aeace0053af2305e8c";
 
 #[post_upgrade]
 #[trace]
@@ -37,10 +41,26 @@ fn post_upgrade(args: Args) {
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
+            let cycle_management_account = AccountIdentifier::from_hex(CYCLE_MANAGEMENT_ACCOUNT)
+                .expect("CYCLE_MANAGEMENT_ACCOUNT is a valid account identifier");
+            state.data.cycle_management_account = vec![cycle_management_account];
+
             bity_ic_canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
 
             info!(version = %upgrade_args.version, "Post-upgrade complete");
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::CYCLE_MANAGEMENT_ACCOUNT;
+    use ic_ledger_types::AccountIdentifier;
+
+    #[test]
+    fn cycle_management_account_is_a_valid_account_identifier() {
+        let account = AccountIdentifier::from_hex(CYCLE_MANAGEMENT_ACCOUNT).unwrap();
+        assert_eq!(account.to_hex(), CYCLE_MANAGEMENT_ACCOUNT);
     }
 }
