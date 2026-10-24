@@ -13,7 +13,6 @@ spec:
           "management",
           "gldt_swap",
           "gldt_stake",
-          # "super_stats_v3",
         ]
 ---
 # Rust canister unit test with coverage
