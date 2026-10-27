@@ -14,10 +14,9 @@ export const GLDT_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_CANISTER_ID;
 export const GLDT_LEDGER_INDEXER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_INDEXER_CANISTER_ID;
-export const GLDT_SUPER_STATS_V3_CANISTER_ID = import.meta.env
-  .VITE_GLDT_SUPER_STATS_V3_CANISTER_ID;
 export const ICP_SWAP_CANISTER_ID = import.meta.env.VITE_ICP_SWAP_CANISTER_ID;
 export const GOLD_API_BASE_URL = import.meta.env.VITE_GOLD_API_BASE_URL;
+export const GLDT_API_BASE_URL = import.meta.env.VITE_GLDT_API_BASE_URL;
 export const GLDT_STAKE_CANISTER_ID = import.meta.env.VITE_GLDT_STAKE_CANISTER_ID;
 
 export const API_OGY_BASE_URL = "https://api.origyn.com"
@@ -85,11 +84,11 @@ if (!(APP_MODE === "production")) {
     );
   else console.log(`GLDT_LEDGER_INDEXER_CANISTER_ID=${GLDT_LEDGER_INDEXER_CANISTER_ID}`);
 
-  if (!GLDT_SUPER_STATS_V3_CANISTER_ID)
+  if (!GLDT_API_BASE_URL)
     console.log(
-      "No GLDT_SUPER_STATS_V3_CANISTER_ID environment variable. Set GLDT_SUPER_STATS_V3_CANISTER_ID environment variable."
+      "No GLDT_API_BASE_URL environment variable. Set GLDT_API_BASE_URL environment variable."
     );
-  else console.log(`GLDT_SUPER_STATS_V3_CANISTER_ID=${GLDT_SUPER_STATS_V3_CANISTER_ID}`);
+  else console.log(`GLDT_API_BASE_URL=${GLDT_API_BASE_URL}`);
 
   if (!ICP_SWAP_CANISTER_ID)
     console.log(

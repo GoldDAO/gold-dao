@@ -6,7 +6,7 @@ import NavbarHome from "@components/shared/navbars/NavbarTop";
 import { ExplorerTable } from "@components/explorer/ExplorerTable";
 import { TopHoldersTable } from "@components/explorer/TopHoldersTable";
 import { ExplorerInfo } from "@components/explorer/Info";
-import { useFetchTopAccountHolders } from "@hooks/gldt_super_stats_v3";
+import { useFetchTopAccountHolders } from "@hooks/gldt_api";
 import { useSearchParams } from "react-router-dom";
 
 enum TAB {
