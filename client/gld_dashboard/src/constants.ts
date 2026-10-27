@@ -56,8 +56,6 @@ export const SNS_GOVERNANCE_CANISTER_ID = import.meta.env
   .VITE_SNS_GOVERNANCE_CANISTER_ID;
 export const SNS_REWARDS_CANISTER_ID = import.meta.env
   .VITE_SNS_REWARDS_CANISTER_ID;
-export const SNS_SUPER_STATS_CANISTER_ID = import.meta.env
-  .VITE_SNS_SUPER_STATS_CANISTER_ID;
 export const GLDT_STAKE_CANISTER_ID = import.meta.env
   .VITE_GLDT_STAKE_CANISTER_ID;
 
@@ -253,12 +251,6 @@ if (!(APP_MODE === "production")) {
   //   console.log(
   //     "No SNS_REWARDS_CANISTER_ID environment variable. Set SNS_REWARDS_CANISTER_ID environment variable."
   //   );
-
-  // if (!SNS_SUPER_STATS_CANISTER_ID)
-  //   console.log(
-  //     "No SNS_SUPER_STATS_CANISTER_ID environment variable. Set SNS_SUPER_STATS_CANISTER_ID environment variable."
-  //   );
-  // else console.log(`SNS_SUPER_STATS_CANISTER_ID=${SNS_SUPER_STATS_CANISTER_ID}`);
 
   // if (!GLDT_STAKE_CANISTER_ID)
   //   console.log(
