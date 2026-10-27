@@ -2,10 +2,6 @@ import clsx from "clsx";
 // import { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { SNS_SUPER_STATS_CANISTER_ID } from "@constants";
-import useFetchHolders from "@services/sns_super_stats/hooks/useFetchHolders";
-import { useAuth } from "@auth/index";
-
 type PERIOD = "1D" | "1W" | "1M" | "3M" | "1Y" | "All";
 
 const ChartPeriodSelector = ({
@@ -59,16 +55,11 @@ const ChartPeriodSelector = ({
 // };
 
 const HoldersChart = ({ className }: { className?: string }) => {
-  const { unauthenticatedAgent } = useAuth();
 
   const [period, setPeriod] = useLocalStorage<PERIOD>(
     "chart-holders-period",
     "1M"
   );
-
-  useFetchHolders(SNS_SUPER_STATS_CANISTER_ID, unauthenticatedAgent, {
-    enabled: !!unauthenticatedAgent,
-  });
 
   return (
     <div className={className}>

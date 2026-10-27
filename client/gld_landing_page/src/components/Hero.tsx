@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
-import { useTokenMetrics } from '@/hooks/useTokenMetrics'
 
 interface InfoCardProps {
   iconSrc: string

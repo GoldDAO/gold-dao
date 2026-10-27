@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.2.2] - 2026-10-27
+
+### Changed
+
+- Explorer top 100 holders now come from the GLDT analytics API (`api.gldt.org`) instead of the GLDT super_stats canister
+- Subaccount holders in the top 100 list now link to the right account page
+
 ### [1.2.1] - 2026-02-17
 
 ### Changed

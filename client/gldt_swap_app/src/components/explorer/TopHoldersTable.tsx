@@ -10,7 +10,7 @@ import {
   useFetchTopAccountHolders,
   AccountTopHolder,
   TxAccount,
-} from "@hooks/gldt_super_stats_v3/index";
+} from "@hooks/gldt_api/index";
 
 export const TopHoldersTable = () => {
   const navigate = useNavigate();
