@@ -162,6 +162,7 @@ include:
     inputs:
       src-folder: gld_landing_page
       sns-controlled: "false"
+      deploy-to-preprod: "false"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: internal_dashboard
