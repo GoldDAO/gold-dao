@@ -432,20 +432,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bity-ic-icrc3-c2c-client"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41a45f55237824b29fc4fb5b52e5b1a4f4d32fc6a02dc3ee2d1d0f73fc31e981"
-dependencies = [
- "bity-ic-canister-client",
- "bity-ic-icrc3 0.4.9",
- "bity-ic-types",
- "candid 0.10.17",
- "ic-cdk 0.18.7",
- "serde",
-]
-
-[[package]]
 name = "bity-ic-icrc3-macros"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1448,156 +1434,6 @@ dependencies = [
  "serde",
  "sha2 0.10.9",
  "time",
- "types",
- "utils",
-]
-
-[[package]]
-name = "gldt_swap"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "bity-ic-canister-logger",
- "bity-ic-canister-state-macros",
- "bity-ic-canister-time",
- "bity-ic-canister-tracing-macros",
- "bity-ic-icrc3 0.5.0",
- "bity-ic-icrc3-macros",
- "bity-ic-serializer",
- "bity-ic-stable-memory",
- "bity-ic-types",
- "candid 0.10.17",
- "futures",
- "gldt_swap_api_archive",
- "gldt_swap_api_canister",
- "gldt_swap_archive_c2c_client",
- "gldt_swap_common",
- "http_request",
- "ic-cdk 0.18.7",
- "ic-cdk-macros 0.18.7",
- "ic-stable-structures",
- "icrc-ledger-types",
- "icrc_ledger_canister",
- "icrc_ledger_canister_c2c_client",
- "lazy_static",
- "origyn_nft_canister",
- "origyn_nft_canister_c2c_client",
- "serde",
- "serde_json",
- "strum 0.27.2",
- "strum_macros 0.27.2",
- "tracing",
- "types",
- "utils",
-]
-
-[[package]]
-name = "gldt_swap_api_archive"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-time",
- "bity-ic-types",
- "candid 0.10.17",
- "ic-ledger-types",
- "icrc-ledger-types",
- "serde",
- "thiserror 2.0.16",
- "types",
-]
-
-[[package]]
-name = "gldt_swap_api_canister"
-version = "0.1.0"
-dependencies = [
- "bity-ic-icrc3 0.5.0",
- "bity-ic-types",
- "candid 0.10.17",
- "gldt_swap_api_archive",
- "gldt_swap_common",
- "icrc-ledger-types",
- "serde",
- "types",
- "utils",
-]
-
-[[package]]
-name = "gldt_swap_archive_c2c_client"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-client",
- "gldt_swap_api_archive",
-]
-
-[[package]]
-name = "gldt_swap_common"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-time",
- "candid 0.10.17",
- "cbor",
- "icrc-ledger-types",
- "minicbor 1.1.0",
- "origyn_nft_canister_c2c_client",
- "serde",
- "types",
-]
-
-[[package]]
-name = "gldt_swap_index"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-logger",
- "bity-ic-canister-state-macros",
- "bity-ic-canister-time",
- "bity-ic-canister-tracing-macros",
- "bity-ic-icrc3-archive-c2c-client",
- "bity-ic-icrc3-c2c-client",
- "bity-ic-serializer",
- "bity-ic-stable-memory",
- "bity-ic-types",
- "bity-ic-utils",
- "candid 0.10.17",
- "futures",
- "gldt_swap_common",
- "gldt_swap_index_api_canister",
- "hex",
- "http_request",
- "ic-cdk 0.18.7",
- "ic-cdk-macros 0.18.7",
- "ic-cdk-timers",
- "ic-ledger-types",
- "ic-stable-structures",
- "ic0 1.0.0",
- "icrc-ledger-types",
- "lazy_static",
- "minicbor 1.1.0",
- "num-bigint",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "serde_json",
- "sha2 0.10.9",
- "time",
- "tracing",
- "tracing-attributes",
- "tracing-subscriber",
- "types",
-]
-
-[[package]]
-name = "gldt_swap_index_api_canister"
-version = "0.1.0"
-dependencies = [
- "bity-ic-icrc3 0.5.0",
- "bity-ic-types",
- "candid 0.10.17",
- "cbor",
- "gldt_swap_common",
- "ic-stable-structures",
- "icrc-ledger-types",
- "minicbor 1.1.0",
- "serde",
- "serde_bytes",
  "types",
  "utils",
 ]
@@ -2619,10 +2455,6 @@ dependencies = [
  "candid 0.10.17",
  "gldt_stake_api_canister",
  "gldt_stake_common",
- "gldt_swap_api_archive",
- "gldt_swap_api_canister",
- "gldt_swap_common",
- "gldt_swap_index_api_canister",
  "hex",
  "http",
  "http-body-util",

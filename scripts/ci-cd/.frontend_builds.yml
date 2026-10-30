@@ -5,10 +5,8 @@ spec:
       options:
         [
           "gld_dashboard",
-          "gldt_swap_app",
           "gld_landing_page",
           "internal_dashboard",
-          "usdg",
         ]
 ---
 # Frontend builds

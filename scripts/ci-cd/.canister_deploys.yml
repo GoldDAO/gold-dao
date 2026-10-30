@@ -5,10 +5,7 @@ spec:
       options:
         [
           "buyback_burn",
-          "gldt_swap",
-          "gldt_swap_index",
           "icp_neuron",
-          # "usdg",
           "management",
           "sns_neuron_controller",
           "sns_rewards",
