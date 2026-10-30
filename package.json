@@ -7,9 +7,9 @@
   "private": true,
   "scripts": {
     "build": "pnpm run build:backdid && pnpm run build:back",
-    "build:back": "scripts/build_canister.sh gldt_swap && scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
-    "build:backdid": "scripts/build_canister.sh --wasmonly gldt_swap && scripts/build_canister.sh --wasmonly sns_rewards && pnpm run build:candid && pnpm run build:declarations && pnpm run build:back",
-    "build:candid": "scripts/generate_did.sh gldt_swap && scripts/generate_did.sh sns_rewards",
+    "build:back": "scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
+    "build:backdid": "scripts/build_canister.sh --wasmonly sns_rewards && pnpm run build:candid && pnpm run build:declarations && pnpm run build:back",
+    "build:candid": "scripts/generate_did.sh sns_rewards",
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
     "lint": "pnpm run lint:back",
     "lint:back": "cargo clippy",

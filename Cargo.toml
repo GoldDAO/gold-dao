@@ -2,11 +2,6 @@
 members = [
   "backend/canisters/buyback_burn/impl",
   "backend/canisters/buyback_burn/api",
-  "backend/canisters/gldt_swap_index/api",
-  "backend/canisters/gldt_swap_index/impl",
-  "backend/canisters/gldt_swap/common",
-  "backend/canisters/gldt_swap/impl",
-  "backend/canisters/gldt_swap/api",
   "backend/canisters/gldt_stake/common",
   "backend/canisters/gldt_stake/impl",
   "backend/canisters/gldt_stake/api",
@@ -22,13 +17,10 @@ members = [
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",
-# "backend/canisters/usdg_minter/impl",
-# "backend/canisters/usdg_minter/api",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
   "backend/external_canisters/origyn_nft/api",
   "backend/external_canisters/origyn_nft/c2c_client",
-  "backend/external_canisters/gldt_swap_archive/c2c_client",
   "backend/libraries/icpswap_client",
   "backend/libraries/http_request",
   "backend/libraries/types",
@@ -65,7 +57,6 @@ minicbor = { version = "1.0.0", features = ["alloc", "derive"] }
 
 proc-macro2 = "1.0.78"
 quote = "1.0.33"
-rmp-serde = "1.1.2"
 rust_decimal = "1.36.0"
 scopeguard = "1.2.0"
 serde = "1.0.196"
@@ -78,8 +69,6 @@ serde_tokenstream = "0.2.0"
 sha2 = "0.10.8"
 syn = { version = "2.0.99", features = ["full"] }
 tracing = "0.1.40"
-tracing-attributes = "0.1.27"
-tracing-subscriber = "0.3.18"
 num-bigint = { version = "0.4.4"}
 time = { version = "0.3.36", features = [
   "macros",
@@ -109,10 +98,7 @@ bity-ic-canister-state-macros = "0.1.0"
 bity-ic-canister-tracing-macros = "0.1.0"
 bity-ic-stable-memory = "0.2.0"
 bity-ic-types = "0.1.0"
-bity-ic-utils = "0.2.0"
 bity-ic-subcanister-manager = "0.3.0"
 bity-ic-icrc3-archive-api = "0.3.0"
-bity-ic-icrc3-archive-c2c-client = "0.3.0"
 bity-ic-candid-gen = "0.1.0"
 bity-ic-ledger-utils = "0.2.1"
-bity-ic-icrc3-c2c-client = "0.1.0"

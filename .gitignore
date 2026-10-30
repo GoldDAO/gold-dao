@@ -20,8 +20,6 @@ tarpaulin-report.html
 *.pem
 proposal.md
 sns_canister_ids.json
-backend/canisters/gldt_swap_archive/
-backend/canisters/gldt_swap/api/declarations.zip
 console.log
 /CHANGELOG.md
 .cargo

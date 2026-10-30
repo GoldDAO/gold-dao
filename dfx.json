@@ -131,33 +131,25 @@
     },
     "gldt_ledger": {
       "candid": "https://raw.githubusercontent.com/dfinity/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/rs/ledger_suite/icrc1/ledger/ledger.did",
+      "remote": {
+        "id": {
+          "ic": "6c7su-kiaaa-aaaar-qaira-cai",
+          "staging": "6uad6-fqaaa-aaaam-abovq-cai"
+        }
+      },
       "type": "custom",
       "wasm": "https://download.dfinity.systems/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/canisters/ic-icrc1-ledger.wasm.gz"
     },
     "gldt_ledger_indexer": {
       "candid": "https://raw.githubusercontent.com/dfinity/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/rs/ledger_suite/icrc1/index-ng/index-ng.did",
+      "remote": {
+        "id": {
+          "ic": "oo6x4-xiaaa-aaaap-abrza-cai",
+          "staging": "wusb2-uiaaa-aaaao-a2lca-cai"
+        }
+      },
       "type": "custom",
       "wasm": "https://download.dfinity.systems/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/canisters/ic-icrc1-index-ng.wasm.gz"
-    },
-    "gldt_swap_app": {
-      "declarations": {
-        "bindings": [],
-        "env_override": null,
-        "output": null
-      },
-      "source": ["client/gldt_swap_app/dist"],
-      "type": "assets"
-    },
-    "usdg": {
-      "build": ["./scripts/build_canister.sh usdg_minter"],
-      "candid": "backend/canisters/usdg/api/can.did",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/usdg/api/declarations"
-      },
-      "type": "custom",
-      "wasm": "backend/canisters/usdg/target/wasm32-unknown-unknown/release/usdg_canister.wasm.gz"
     },
     "icp_neuron": {
       "build": ["./scripts/build_canister.sh icp_neuron"],
@@ -243,33 +235,6 @@
       },
       "type": "custom",
       "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
-    },
-    "gldt_swap": {
-      "build": ["./scripts/build_canister.sh gldt_swap"],
-      "candid": "backend/canisters/gldt_swap/api/can.did",
-      "declarations": {
-        "bindings": ["ts", "js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_swap/api/declarations"
-      },
-      "metadata": [
-        {
-          "name": "candid:service"
-        }
-      ],
-      "type": "custom",
-      "wasm": "backend/canisters/gldt_swap/target/wasm32-unknown-unknown/release/gldt_swap_canister.wasm.gz"
-    },
-    "gldt_swap_index": {
-      "build": ["./scripts/build_canister.sh gldt_swap_index"],
-      "candid": "backend/canisters/gldt_swap_index/api/can.did",
-      "declarations": {
-        "bindings": ["ts", "js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_swap_index/api/declarations"
-      },
-      "type": "custom",
-      "wasm": "backend/canisters/gldt_swap_index/target/wasm32-unknown-unknown/release/gldt_swap_index_canister.wasm.gz"
     },
     "gldt_stake": {
       "build": ["./scripts/build_canister.sh gldt_stake"],
