@@ -36,12 +36,6 @@ include:
       src-folder: gld_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
-      src-folder: gldt_swap_app
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
-      src-folder: usdg
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
       src-folder: gld_dashboard
   # - local: scripts/ci-cd/.frontend_linter.yml
   #   inputs:
@@ -68,12 +62,6 @@ include:
       src-folder: sns_neuron_controller
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
-      src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: gldt_swap_index
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
       src-folder: gldt_stake
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
@@ -98,15 +86,6 @@ include:
       src-folder: super_stats_v3
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
-      src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: gldt_swap_index
-  # - local: scripts/ci-cd/.canister_builds.yml
-  #   inputs:
-  #     src-folder: usdg_minter
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
       src-folder: gldt_stake
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
@@ -114,20 +93,11 @@ include:
       src-folder: gld_landing_page
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
-      src-folder: gldt_swap_app
-  - local: scripts/ci-cd/.frontend_builds.yml
-    inputs:
       src-folder: gld_dashboard
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: internal_dashboard
   # Backend deployments
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: gldt_swap_index
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: buyback_burn
@@ -156,12 +126,9 @@ include:
       sns-controlled: "true"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
-      src-folder: gldt_swap_app
-      sns-controlled: "false"
-  - local: scripts/ci-cd/.frontend_deploys.yml
-    inputs:
       src-folder: gld_landing_page
       sns-controlled: "false"
+      deploy-to-preprod: "false"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: internal_dashboard

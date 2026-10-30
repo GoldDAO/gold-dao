@@ -12,20 +12,16 @@ All the backend canisters are included in the folder [`backend/canisters`](backe
 
 - [`buyback_burn`](backend/canisters/buyback_burn/): A canister that swaps `ICP` tokens for `GOLDAO` and then burns the tokens.
 - [`gldt_stake (WIP)`](backend/canisters/gldt_stake/): The core logic for the `GLDT` staking.
-- [`gldt_swap`](backend/canisters/gldt_swap/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
-- [`gldt_swap_archive`](backend/canisters/gldt_swap_archive/): The archive canister used for the scalability of gldt_swap.
 - [`icp_neuron`](backend/canisters/icp_neuron/): The canister that controls the ICP neurons of the Gold DAO.
 - [`sns_neuron_controller`](backend/canisters/sns_neuron_controller/): The canister that controls the SNS neurons of the Gold DAO.
 - [`sns_rewards`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
 - [`super_stats_v3`](backend/canisters/super_stats_v3/): The canister that collects the Gold DAO statistics.
 - [`token_metrics`](backend/canisters/token_metrics/): The canister that collects the Gold NFT metrics.
-- [`usdg_minter (WIP)`](backend/canisters/usdg_minter/): The canister that allows users to mint `USDG` using `GLDT` as collateral.
 
 ### Frontend canisters
 
 The frontend canisters of the project are included in the folder [`client`](client/)
 
-- [`swap_app`](client/swap_app/): Contains the NextJS frontend for the [swap application](https://app.gldt.org).
 - [`landing_page`](client/landing_page/): Contains the NextJS frontend for the [gldt.org landing page](https://gldt.org).
 - [`explorer`](client/explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
 
@@ -58,21 +54,11 @@ npm start
 
 > **⚠️ Some resources (fonts, images...) will return errors (`400`) if accessed from `http://127.0.0.1:<REPLICA_PORT>/?canisterId=<FRONTEND_CANISTER_ID>`**. Instead, use the following url to access the locally deployed dapp: `http://<FRONTEND_CANISTER_ID>.localhost:<REPLICA_PORT>/`.
 
-To redeploy your latest changes on `gldt_swap`, or on the frontend:
+To redeploy your latest changes:
 
 ```sh
 npm run deploy
 ```
-
-If you need to test a redeploy operation for a canister (`gldt_swap` or `gldt_ledger`), you can use one of those scripts:
-
-```sh
-scripts/deploy-gldt-core.sh --help
-scripts/deploy-gldt-fee-compensation.sh --help
-scripts/deploy-ledger.sh --help
-```
-
-Each one contains safeguards against accidental deployments on staging or mainnet.
 
 And to restart a fresh environment and redeploy all canisters, simply redo a `npm start`. It will stop the currently running replica if any, and restart a clean one, then redeploy everything.
 
@@ -82,7 +68,7 @@ All frontends are developed in React, using the NextJS compiler to generate the 
 To launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/):
 
 ```sh
-npm run dev:gldt_swap_app # For the GLDT swap application frontend
+pnpm --filter gld_dashboard run dev # For the Gold DAO dashboard frontend
 ```
 
 The frontend development server will be available at `http://localhost:3000`.
@@ -127,7 +113,7 @@ export CANISTER_NAME=<THE_CANISTER_NAME>
 e.g.
 
 ```sh
-export CANISTER_NAME=gldt_swap
+export CANISTER_NAME=buyback_burn
 ```
 
 Build the canister

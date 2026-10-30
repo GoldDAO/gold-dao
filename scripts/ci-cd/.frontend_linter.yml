@@ -4,11 +4,9 @@ spec:
       description: The NextJS project folder. Must be located in the /client/ folder
       options:
         [
-          "gldt_swap_app",
           "gld_dashboard",
           "gld_landing_page",
           "internal_dashboard",
-          "usdg",
         ]
 ---
 # Front-end (NextJS) linter job template
