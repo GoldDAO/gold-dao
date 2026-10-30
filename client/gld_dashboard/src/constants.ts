@@ -45,8 +45,6 @@ export const CKUSDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_CKUSDT_LEDGER_INDEX_CANISTER_ID;
 
 export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
-export const SWAP_INDEXER_CANISTER_ID = import.meta.env
-  .VITE_SWAP_INDEXER_CANISTER_ID;
 export const SNS_NEURONS_ICP_CANISTER_ID = import.meta.env
   .VITE_SNS_NEURONS_ICP_CANISTER_ID;
 export const SNS_NEURONS_OGY_CANISTER_ID = import.meta.env
