@@ -14,13 +14,32 @@ Preparing assets for $CANISTER_NAME on $NETWORK
 "
 
 
-# dfx canister call --network $NETWORK $CANISTER_NAME delete_batch '(record { batch_id = 5 : nat })'
+run_prepare() {
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    echo "Deploying from local system."
+    ENV=$NETWORK VERSION="local-deploy" dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+  else
+    dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+  fi
+}
 
-if [[ "$(uname -s)" == "Darwin" ]]; then
-  echo "Deploying from local systen."
-  ENV=$NETWORK VERSION="local-deploy" dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
-else
-  dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+run_prepare
+
+# A batch left in "proposed" state by an earlier run (for example a deploy job that failed after the
+# upload) blocks every new batch: "Batch N is already proposed. Delete or execute it to propose another."
+# Delete it and retry only when the operator asks for it with the job variable DELETE_PROPOSED_BATCH=true,
+# because a proposed batch may belong to a proposal that is still being voted on.
+STALE_BATCH=$(grep -o "Batch [0-9]* is already proposed" $LOG_FILE | awk '{print $2}' | head -n 1)
+
+if [[ -n $STALE_BATCH ]]; then
+  if [[ $DELETE_PROPOSED_BATCH == "true" ]]; then
+    echo "Deleting proposed batch $STALE_BATCH left by an earlier run (DELETE_PROPOSED_BATCH=true)."
+    dfx canister call --network $NETWORK $CANISTER_NAME delete_batch "(record { batch_id = $STALE_BATCH : nat })"
+    run_prepare
+  else
+    echo "Error: batch $STALE_BATCH on $CANISTER_NAME ($NETWORK) is already proposed. If no proposal is pending for it, run this job again with the variable DELETE_PROPOSED_BATCH=true to delete it first."
+    exit 1
+  fi
 fi
 
 echo "Last line: $(tail -n 1 $LOG_FILE)"
