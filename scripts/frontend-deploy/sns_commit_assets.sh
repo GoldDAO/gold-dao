@@ -64,7 +64,8 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-PROPOSAL_SUMMARY=$(cat proposal.md)
+# Escape backslashes and double quotes: the summary is embedded in a Candid text literal below.
+PROPOSAL_SUMMARY=$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' proposal.md)
 
 [ -e message.json ] && rm message.json
 
