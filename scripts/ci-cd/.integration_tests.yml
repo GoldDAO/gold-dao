@@ -72,13 +72,13 @@ integration tests:
     KUBERNETES_MEMORY_REQUEST: "5Gi"
     KUBERNETES_CPU_LIMIT: "2"
     KUBERNETES_CPU_REQUEST: "1"
-    # The pocket-ic crate in Cargo.lock (9.0.2) only accepts a server whose
-    # version is exactly 9.0.3. It runs the binary named by POCKET_IC_BIN. When
-    # the variable is unset or the binary has another version, the crate
-    # downloads server 9.0.3 itself while the tests run, with no checksum.
+    # The pocket-ic crate in Cargo.lock (12.0.0) accepts a server from 12.0.0 up
+    # to, not including, 13. It runs the binary named by POCKET_IC_BIN and stops
+    # if that binary has another version. Without the variable the crate
+    # downloads a server itself while the tests run, with no checksum.
     # Change the version here together with the crate.
-    POCKET_IC_VERSION: "9.0.3"
-    POCKET_IC_SHA256: "cbf40823baa872cecaa43e3d9990ed22d26e06942e46d09f59057e8e12b52f8e"
+    POCKET_IC_VERSION: "12.0.0"
+    POCKET_IC_SHA256: "91405ba12fe8a8402cd5903fb43f5927771a5493a970cfcf3ae0dfbd8bdb45ac"
     POCKET_IC_BIN: "$CI_PROJECT_DIR/backend/integration_testing/pocket-ic"
   rules:
     - if: *backend_release_tag
