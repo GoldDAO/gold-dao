@@ -1,5 +1,4 @@
 import { useAtom } from "jotai";
-import { Link } from "react-router-dom";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
 import BtnPrimary from "@shared/ui/button/HorizontalButton";
@@ -49,15 +48,17 @@ const InsufficientGLDTDisclaimer = ({
         </div>
       </div>
       <div>
-        <Link
-          to={"/buy"}
+        <a
+          href="https://gldt.org/"
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={() => {
             dispatchSwapNFT({ type: "RESET" });
             dispatchSelectNFTState({ type: "RESET" });
           }}
         >
-          <BtnPrimary>Buy GLDT</BtnPrimary>
-        </Link>
+          <BtnPrimary>Get GLDT on gldt.org</BtnPrimary>
+        </a>
       </div>
     </div>
   );
