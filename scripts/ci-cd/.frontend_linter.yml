@@ -9,26 +9,34 @@ spec:
           "internal_dashboard",
         ]
 ---
-# Front-end (NextJS) linter job template
+# Front-end linter job template
+#
+# The "changes" lists name the whole app folder and the two files of the pnpm
+# workspace that every app reads. A list of file extensions misses things that
+# change the build: the .env files, the lockfile, images, the locale files of
+# the landing page, .npmrc and public/.well-known/ii-alternative-origins.
+# The root pnpm-lock.yaml is not in the lists: .npmrc sets
+# shared-workspace-lockfile=false, so pnpm reads the lockfile in the app folder
+# and never the root one.
 
 $[[ inputs.src-folder ]] linter:
   stage: lint
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Not on the merge request from develop, see the note on "rust lint" in .gitlab-ci.yml
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-        - "pnpm-lock.yaml"
+        - "client/$[[ inputs.src-folder ]]/**/*"
         - "pnpm-workspace.yaml"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
+        - ".npmrc"
+        # A change to the job itself (for example the Node version) is tried
+        # on its merge request
+        - "scripts/ci-cd/.{node_template,frontend_linter}.yml"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-        - "client/$[[ inputs.src-folder ]]/**/pnpm-lock.yaml"
+        - "client/$[[ inputs.src-folder ]]/**/*"
         - "pnpm-workspace.yaml"
+        - ".npmrc"
   extends: .node template
   script:
-    - pnpm --filter $[[ inputs.src-folder ]] install
+    - pnpm --filter $[[ inputs.src-folder ]] install --frozen-lockfile
     - pnpm --filter $[[ inputs.src-folder ]] run lint
