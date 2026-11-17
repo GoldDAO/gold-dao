@@ -11,10 +11,11 @@
     - if [[ $(date -R) == "Fri"* ]]; then echo "It appear you are deploying on a Friday....."; fi
     - dfx identity get-principal
 
+# didc encodes the payload of frontend upgrade proposals
 .include didc:
   before_script:
-    - release=$(curl --silent "https://api.github.com/repos/dfinity/candid/releases/latest" | grep -e '"tag_name"' | cut -c 16-25)
-    # - curl -fsSL https://github.com/dfinity/candid/releases/download/${release}/didc-linux64 > /usr/bin/didc
     - curl -fsSL https://github.com/dfinity/candid/releases/download/2025-07-29/didc-linux64 > /usr/bin/didc
+    # This job holds the production key: do not run a download that is not the expected file
+    - echo "bd082fe97821e2323b742d14f2fc9e6c90a646fb06f8f8fc95c6032cd3d283e5  /usr/bin/didc" | sha256sum -c -
     - chmod +x /usr/bin/didc
     - didc --version

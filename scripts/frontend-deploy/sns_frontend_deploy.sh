@@ -3,11 +3,16 @@
 show_help() {
   cat << EOF
 Frontend canister deploy script via SNS proposal.
-Must be run from the repository's root folder, and with a running replica if for local deployment.
-'preprod', 'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
+Must be run from the repository's root folder. The networks are 'staging' and 'ic'.
+
+The built frontend is uploaded to the asset canister as a proposed batch, then a
+proposal is submitted that asks SNS governance to commit that batch. The new
+version goes live when the proposal is adopted.
+
+The frontend needs an entry in scripts/frontend-deploy/frontend_config.json.
 
 Usage:
-  deploy-frontend.sh [options] <CANISTER-NAME> <NETWORK>
+  sns_frontend_deploy.sh [options] <CANISTER-NAME> <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
@@ -47,7 +52,15 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Compiles the frontend code and uploads the assets to canister memory in prepare stage. Needs to be committed in the next stage
+# Stops here, before anything is uploaded, if the proposal could not be submitted afterwards.
+./scripts/frontend-deploy/sns_check_inputs.sh $CANISTER_NAME $NETWORK $VERSION
+
+if [ $? -ne 0 ]; then
+  echo "Error in sns_check_inputs.sh"
+  exit 1
+fi
+
+# Uploads the built assets to the canister as a proposed batch. Exports BATCH_ID and EVIDENCE.
 . ./scripts/frontend-deploy/sns_prepare_assets.sh $CANISTER_NAME $NETWORK
 
 if [ $? -ne 0 ]; then
@@ -55,7 +68,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Commits the previously prepared assets and creates a proposal on the SNS to vote about the upgrade.
+# Submits the SNS proposal that commits the proposed batch.
 ./scripts/frontend-deploy/sns_commit_assets.sh $CANISTER_NAME $NETWORK $BATCH_ID $EVIDENCE $VERSION $COMMIT_SHA
 
 if [ $? -ne 0 ]; then

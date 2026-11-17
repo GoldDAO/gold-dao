@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Uploads the built frontend to its asset canister as a proposed batch and
+# exports BATCH_ID and EVIDENCE for the proposal. Nothing goes live here: the
+# canister keeps serving the current version until SNS governance commits the
+# batch.
+#
+# The identity needs the Prepare permission on the asset canister. Only one
+# batch can be proposed at a time. A batch that an earlier run left behind is
+# deleted when the job runs with the variable DELETE_PROPOSED_BATCH=true, see
+# below.
+
 CANISTER_NAME=$1
 NETWORK=$2
 
@@ -12,7 +22,6 @@ Preparing assets for $CANISTER_NAME on $NETWORK
 
 **********************************************************************
 "
-
 
 run_prepare() {
   if [[ "$(uname -s)" == "Darwin" ]]; then
@@ -47,10 +56,15 @@ if [[ -n $STALE_BATCH ]]; then
   fi
 fi
 
-echo "Last line: $(tail -n 1 $LOG_FILE)"
+# dfx reports "Proposed commit of batch <id> with evidence <hash>. Either commit it by proposal, or delete it."
+# The line is searched in the whole output, so the job does not depend on it
+# being the last line dfx prints.
+PROPOSED=$(grep -oE 'Proposed commit of batch [0-9]+ with evidence [0-9a-f]+' $LOG_FILE | tail -n 1) || true
 
-export BATCH_ID=$(tail -n 1 $LOG_FILE | awk '{print $5}')
-export EVIDENCE=$(tail -n 1 $LOG_FILE | awk '{print $8}' | sed "s/\.//" )
+echo "Proposed batch line: $PROPOSED"
+
+export BATCH_ID=$(echo "$PROPOSED" | awk '{print $5}')
+export EVIDENCE=$(echo "$PROPOSED" | awk '{print $8}')
 
 echo "Batch number: $BATCH_ID, Evidence: $EVIDENCE"
 
