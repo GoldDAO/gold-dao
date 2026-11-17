@@ -1,17 +1,69 @@
+# Integration tests (PocketIC)
+#
+# On a merge request to develop the jobs below appear when backend code changes
+# and wait for a manual start of "integration tests trigger". On a release tag
+# of a backend canister they run without a trigger, and the production deploy
+# of that canister needs "integration tests".
+
 integration tests trigger:
   stage: integration_testing
   rules:
     # This will run on any MR to develop
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" &&
           $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
-      changes:
+      changes: &integration_test_changes
         - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
         - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
         - "backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
         - "backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "Cargo.{lock,toml}"
+        # A change to the build or to these jobs is tried on its merge request
+        - "scripts/{build_canister,generate_did,canister_prebuilds}.sh"
+        - "scripts/ci-cd/.{rust_template,integration_tests}.yml"
       when: manual
   script:
     - echo "Running integration tests"
+
+# Builds every canister with the "inttest" feature, in one job. The canisters
+# compile into one cargo target dir (CANISTER_SHARED_TARGET_DIR, see
+# scripts/build_canister.sh), so the dependencies they share are built once.
+# With one job and one target dir per canister each job compiled all of them
+# again. These wasm files are never deployed.
+integration-test build:
+  stage: integration_testing
+  extends: .rust template
+  variables:
+    CANISTER_SHARED_TARGET_DIR: "target/inttest"
+    # The scheduler reserves the request, not the limit.
+    KUBERNETES_MEMORY_REQUEST: "2Gi"
+    KUBERNETES_MEMORY_LIMIT: "5Gi"
+    KUBERNETES_CPU_REQUEST: "1"
+    KUBERNETES_CPU_LIMIT: "2"
+  rules:
+    # Release tag of a backend canister. The list names the canisters that
+    # have a production build. Frontend tags and tags of canisters that left
+    # this repository do not match.
+    - if: &backend_release_tag $CI_COMMIT_TAG =~ '/^(buyback_burn|management|icp_neuron|sns_neuron_controller|sns_rewards|super_stats_v3|gldt_stake)-v\d+\.\d+\.\d+(-reinstall)?$/'
+    # This will run on any MR to develop
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" &&
+          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      changes: *integration_test_changes
+      needs: ["integration tests trigger"]
+  script:
+    # The canisters whose wasm backend/integration_testing/src/wasms.rs loads
+    # from the canister folders
+    - |
+      for canister in buyback_burn management icp_neuron sns_neuron_controller sns_rewards super_stats_v3 gldt_stake; do
+        scripts/build_canister.sh -it "$canister" || exit 1
+        scripts/generate_did.sh "$canister" || exit 1
+      done
+  artifacts:
+    name: "${CI_COMMIT_SHORT_SHA}-wasm-INT_TEST_BUILD"
+    paths:
+      # The only files the tests read. The whole release folder of one canister
+      # is 60 to 90 MB.
+      - backend/canisters/*/target/wasm32-unknown-unknown/release/*_canister.wasm.gz
+    expire_in: 1 day
 
 integration tests:
   stage: integration_testing
@@ -20,35 +72,29 @@ integration tests:
     KUBERNETES_MEMORY_REQUEST: "5Gi"
     KUBERNETES_CPU_LIMIT: "2"
     KUBERNETES_CPU_REQUEST: "1"
+    # The pocket-ic crate in Cargo.lock (12.0.0) accepts a server from 12.0.0 up
+    # to, not including, 13. It runs the binary named by POCKET_IC_BIN and stops
+    # if that binary has another version. Without the variable the crate
+    # downloads a server itself while the tests run, with no checksum.
+    # Change the version here together with the crate.
+    POCKET_IC_VERSION: "12.0.0"
+    POCKET_IC_SHA256: "91405ba12fe8a8402cd5903fb43f5927771a5493a970cfcf3ae0dfbd8bdb45ac"
+    POCKET_IC_BIN: "$CI_PROJECT_DIR/backend/integration_testing/pocket-ic"
   rules:
-    - if: >
-        $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+(-reinstall)?$/' &&
-        $CI_COMMIT_TAG !~ '/gld_dashboard|gld_landing_page/'
-      when: always
+    - if: *backend_release_tag
     # This will run on any MR to develop
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" &&
           $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}"
-  needs:
-    [
-      "buyback_burn integration-test build",
-      "icp_neuron integration-test build",
-      "management integration-test build",
-      "sns_neuron_controller integration-test build",
-      "sns_rewards integration-test build",
-      "super_stats_v3 integration-test build",
-      "gldt_stake integration-test build",
-    ]
+      changes: *integration_test_changes
+  needs: ["integration-test build"]
   extends: .rust template
   script:
-    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/9.0.1/pocket-ic-x86_64-linux.gz
+    - wget -O pocket-ic.gz "https://github.com/dfinity/pocketic/releases/download/${POCKET_IC_VERSION}/pocket-ic-x86_64-linux.gz"
+    - echo "${POCKET_IC_SHA256}  pocket-ic.gz" | sha256sum -c -
     - gzip -d pocket-ic.gz
     - chmod +x ./pocket-ic
-    - mv ./pocket-ic ./backend/integration_testing/pocket-ic
+    - mv ./pocket-ic $POCKET_IC_BIN
+    - $POCKET_IC_BIN --version
     - ulimit -n 809600
     - ulimit -f 8096000
     - cargo test -p integration_testing

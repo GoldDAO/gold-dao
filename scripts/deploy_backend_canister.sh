@@ -99,7 +99,15 @@ elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
     --target-canister-id $(cat canister_ids.json | jq -r .$CANISTER.$NETWORK) \
     --wasm-path backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
     --title "Upgrade $CANISTER to version $VERSION" \
-    --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
+    --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes - 2>&1 | tee console.log
+
+  # quill exits with 0 even if governance answers with an error. It prints
+  # "Successfully created new proposal with ID <n>" when the proposal exists and
+  # "SNS governance error: ..." when governance refused it.
+  if ! grep -q "Successfully created new proposal" console.log; then
+    echo "Error: SNS governance did not accept the proposal to $INSTALL_MODE $CANISTER."
+    exit 1
+  fi
 else
   echo "Error: invalid deployment mode. Needs to be 'direct' or 'proposal'."
   exit 2

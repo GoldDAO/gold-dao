@@ -60,7 +60,20 @@ fi
 
 echo $INTTEST
 ./scripts/canister_prebuilds.sh $1 $BASE_CANISTER_PATH "$INTTEST"
-cargo build --target wasm32-unknown-unknown --target-dir $BASE_CANISTER_PATH/$1/target --release --locked $INTTEST -p $1
+
+# CANISTER_SHARED_TARGET_DIR makes several canisters compile into one cargo
+# target dir, so the dependencies they have in common are built once. The wasm
+# is then copied to this canister's own target dir, where the rest of this
+# script, generate_did.sh and the integration tests expect it. Leave it unset
+# for builds that get deployed: they keep a target dir of their own.
+if [[ -n $CANISTER_SHARED_TARGET_DIR ]]; then
+  RELEASE_PATH=$BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release
+  cargo build --target wasm32-unknown-unknown --target-dir "$CANISTER_SHARED_TARGET_DIR" --release --locked $INTTEST -p $1 || exit 1
+  mkdir -p $RELEASE_PATH
+  cp "$CANISTER_SHARED_TARGET_DIR/wasm32-unknown-unknown/release/$1.wasm" $RELEASE_PATH/$1.wasm || exit 1
+else
+  cargo build --target wasm32-unknown-unknown --target-dir $BASE_CANISTER_PATH/$1/target --release --locked $INTTEST -p $1 || exit 1
+fi
 
 if [[ -v $WASMONLY ]]; then
   rm -f $BASE_CANISTER_PATH/$1/api/can.did

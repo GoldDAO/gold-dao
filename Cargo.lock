@@ -285,7 +285,7 @@ checksum = "b373ff7cd083e2742b7bdd1dfe978f275fa7f7ce727e6b97faa9c77110d07e89"
 dependencies = [
  "anyhow",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk 0.18.7",
  "serde",
  "tracing",
@@ -298,7 +298,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c108cecb821bb7d2769c7c7783624dbe7faf855690b7fb8cfc42a3d6ce0038d"
 dependencies = [
  "bity-ic-canister-time",
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "tracing",
  "tracing-subscriber",
@@ -348,7 +348,7 @@ dependencies = [
  "bity-ic-subcanister-manager",
  "bity-ic-types",
  "bity-ic-utils",
- "candid 0.10.17",
+ "candid 0.10.20",
  "canfund",
  "futures",
  "hex",
@@ -380,7 +380,7 @@ dependencies = [
  "bity-ic-subcanister-manager",
  "bity-ic-types",
  "bity-ic-utils",
- "candid 0.10.17",
+ "candid 0.10.20",
  "canfund",
  "futures",
  "hex",
@@ -406,7 +406,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "01854537cc6b36007464f93a69bd97f6de343b1c65cf992b0b4551c94813d679"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-stable-structures",
  "icrc-ledger-types",
@@ -426,7 +426,7 @@ dependencies = [
  "bity-ic-canister-client",
  "bity-ic-icrc3-archive-api",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk 0.18.7",
  "serde",
 ]
@@ -451,7 +451,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3138d28edc0a5c1800aa5ceb83c3a83a70a8efe3cf9471ec94bfa81dc0e167b6"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-ledger-types",
  "icrc-ledger-types",
  "sha2 0.10.9",
@@ -484,7 +484,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a76c66dd3e532aa4281781940995186170c984ceda656caaf336aed10b744a19"
 dependencies = [
  "bity-ic-utils",
- "candid 0.10.17",
+ "candid 0.10.20",
  "canfund",
  "ic-cdk 0.18.7",
  "ic0 0.25.1",
@@ -497,7 +497,7 @@ version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d955ff19e43ae8ce97180bf67212c09c19a51989462b9ed698a47277c9151ef8"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-stable-structures",
  "icrc-ledger-types",
  "serde",
@@ -513,11 +513,11 @@ dependencies = [
  "bity-ic-canister-time",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-cdk 0.18.7",
  "ic-cdk-timers",
- "ic-management-canister-types",
+ "ic-management-canister-types 0.3.3",
  "icrc-ledger-types",
  "serde",
  "tokio",
@@ -562,7 +562,7 @@ dependencies = [
  "bity-ic-stable-memory",
  "bity-ic-types",
  "buyback_burn_api",
- "candid 0.10.17",
+ "candid 0.10.20",
  "enum_dispatch",
  "futures",
  "http_request",
@@ -591,7 +591,7 @@ name = "buyback_burn_api"
 version = "0.1.0"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk 0.18.7",
  "ic-ledger-types",
  "ic-stable-structures",
@@ -693,14 +693,14 @@ dependencies = [
 
 [[package]]
 name = "candid"
-version = "0.10.17"
+version = "0.10.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eaac522d18020d5fbc8320ecb12a9b13b2137ae31133da2d42fa256a825507c4"
+checksum = "8037a01ec09d6c06883a38bad4f47b8d06158ad360b841e0ae5707c9884dfaf6"
 dependencies = [
  "anyhow",
  "binread",
  "byteorder",
- "candid_derive 0.10.17",
+ "candid_derive 0.10.20",
  "hex",
  "ic_principal",
  "leb128",
@@ -728,9 +728,9 @@ dependencies = [
 
 [[package]]
 name = "candid_derive"
-version = "0.10.17"
+version = "0.10.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a1b4fddbd462182050989068d53604a91a3d0f117c3c8316c6818023df00add"
+checksum = "fb45f4d5eff3805598ee633dd80f8afb306c023249d34b5b7dfdc2080ea1df2e"
 dependencies = [
  "lazy_static",
  "proc-macro2",
@@ -745,7 +745,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37c0fc82e7f3498d9e6bfb0f8eee841c664179b2b5087ad303e1812e67c48ede"
 dependencies = [
  "async-trait",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "ic-cdk 0.18.7",
  "ic-cdk-timers",
@@ -763,7 +763,7 @@ version = "0.1.0"
 dependencies = [
  "assert_matches",
  "bity-ic-canister-logger",
- "candid 0.10.17",
+ "candid 0.10.20",
  "icrc-ledger-types",
  "minicbor 1.1.0",
  "num-bigint",
@@ -1371,7 +1371,7 @@ dependencies = [
  "bity-ic-serializer",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "gldt_stake_api_canister",
  "gldt_stake_common",
@@ -1406,7 +1406,7 @@ version = "0.1.0"
 dependencies = [
  "bity-ic-icrc3 0.4.9",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "gldt_stake_common",
  "ic-cdk 0.18.7",
  "icrc-ledger-types",
@@ -1424,7 +1424,7 @@ dependencies = [
  "bity-ic-canister-time",
  "bity-ic-icrc3 0.4.9",
  "bity-ic-icrc3-macros",
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-cdk 0.18.7",
  "ic-stable-structures",
@@ -1678,7 +1678,7 @@ dependencies = [
  "async-watch",
  "backoff",
  "cached 0.52.0",
- "candid 0.10.17",
+ "candid 0.10.20",
  "der",
  "ecdsa",
  "ed25519-consensus",
@@ -1719,7 +1719,7 @@ version = "3.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0efada960a6c9fb023f45ed95801b757a033dafba071e4f386c6c112ca186d9"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-certification",
  "leb128",
  "nom",
@@ -1745,11 +1745,11 @@ version = "0.18.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4efb278f5d3ef033b3eed7f01f1096eaf67701896aa5ef69f5eddf5a84833dc0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk-executor",
  "ic-cdk-macros 0.18.7",
  "ic-error-types",
- "ic-management-canister-types",
+ "ic-management-canister-types 0.3.3",
  "ic0 1.0.0",
  "serde",
  "serde_bytes",
@@ -1787,7 +1787,7 @@ version = "0.18.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7eb14c5d691cc9d72bb95459b4761e3a4b3444b85a63d17555d5ddd782969a1e"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "darling",
  "proc-macro2",
  "quote",
@@ -1800,7 +1800,7 @@ version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea87cf31444de833db85bbd15e97bc135ee14529b13158ffdaf6530bf6d7e85"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "ic-cdk 0.18.7",
  "ic0 1.0.0",
@@ -1816,7 +1816,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "546dfd75c4da975b9f1c55ef3da461321ab4313a66da653af321ed6dc7319b61"
 dependencies = [
  "cached 0.54.0",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cbor",
  "ic-certification",
  "lazy_static",
@@ -1858,7 +1858,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d1a65b0ffb568e954750067f660e254f4564394f5c064a88e0e93b2eea4a532"
 dependencies = [
  "base64 0.22.1",
- "candid 0.10.17",
+ "candid 0.10.20",
  "http",
  "ic-certification",
  "ic-representation-independent-hash",
@@ -1875,7 +1875,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "21905509b6250e81dc9731f3360c282884d36e98196b514d58116b3dbb4683cd"
 dependencies = [
  "bytes",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "http",
  "http-body",
@@ -1893,7 +1893,7 @@ version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "feb52826a353b583012628af6da762b52672350686c3275234febfadeca965ea"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "crc32fast",
  "hex",
  "ic-cdk 0.18.7",
@@ -1908,7 +1908,18 @@ version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea7e5b8a0f7c3b320d9450ac950547db4f24a31601b5d398f9680b64427455d2"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "ic-management-canister-types"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3149217e24186df3f13dc45eee14cdb3e5cad07d0b2b67bd53555c1c55462957"
+dependencies = [
+ "candid 0.10.20",
  "serde",
  "serde_bytes",
 ]
@@ -1930,7 +1941,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9dda1e3e44089054b2dd05c49467cda769d08df7862c4235c3d8869f8a3f9f19"
 dependencies = [
  "base64 0.22.1",
- "candid 0.10.17",
+ "candid 0.10.20",
  "flate2",
  "hex",
  "http",
@@ -1989,7 +2000,7 @@ version = "0.40.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2e7706e55836e8104c98149ec0796d20d5213fef972ac01b544657d410f1883"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-certification",
  "leb128",
@@ -2007,7 +2018,7 @@ version = "0.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5527e1eed0407cf4aa8ced1bc22181c2ae09f8385a00d270f146310b9379c6ad"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-certification",
  "leb128",
@@ -2026,7 +2037,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2d1812840b28c9f526d8e9642d5ffe347a91c22537c24d4ba3c334f74bcd012e"
 dependencies = [
  "async-trait",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures-util",
  "ic-agent",
  "once_cell",
@@ -2111,7 +2122,7 @@ name = "icp_ledger_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-candid-gen",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-ledger-types",
  "serde",
 ]
@@ -2136,7 +2147,7 @@ dependencies = [
  "bity-ic-serializer",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "getrandom 0.2.16",
  "hex",
@@ -2171,7 +2182,7 @@ name = "icp_neuron_api_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "icp_neuron_common",
  "nns_governance_canister",
  "serde",
@@ -2184,7 +2195,7 @@ name = "icp_neuron_common"
 version = "0.1.0"
 dependencies = [
  "bity-ic-ledger-utils",
- "candid 0.10.17",
+ "candid 0.10.20",
  "icrc-ledger-types",
  "nns_governance_canister",
  "serde",
@@ -2198,7 +2209,7 @@ name = "icpswap_client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk 0.18.7",
  "ic-ledger-types",
  "icpswap_swap_pool_canister",
@@ -2212,7 +2223,7 @@ dependencies = [
 name = "icpswap_swap_pool_canister"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
 ]
 
@@ -2228,7 +2239,7 @@ dependencies = [
 name = "icpswap_token_canister"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
 ]
 
@@ -2246,7 +2257,7 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90569d2894d9536c5416943556ac6339df249f06611b3c41029196b39e0dd119"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "minicbor 0.19.1",
  "num-bigint",
  "num-traits",
@@ -2259,7 +2270,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "87c31beeee0e5ab964861a3d5ea2b5ed7b688b2b22400367a832b1fcf0db1fa4"
 dependencies = [
  "base32",
- "candid 0.10.17",
+ "candid 0.10.20",
  "crc32fast",
  "hex",
  "ic-stable-structures",
@@ -2281,7 +2292,7 @@ name = "icrc_ledger_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-candid-gen",
- "candid 0.10.17",
+ "candid 0.10.20",
  "icrc-ledger-types",
  "serde",
 ]
@@ -2291,7 +2302,7 @@ name = "icrc_ledger_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
  "bity-ic-canister-client",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk 0.18.7",
  "icrc_ledger_canister",
  "types",
@@ -2452,7 +2463,7 @@ dependencies = [
  "bity-ic-types",
  "buyback_burn_api",
  "bytes",
- "candid 0.10.17",
+ "candid 0.10.20",
  "gldt_stake_api_canister",
  "gldt_stake_common",
  "hex",
@@ -2503,16 +2514,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "469fb0b9cefa57e3ef31275ee7cacb78f2fdca44e4765491884a2b119d4eb130"
 
 [[package]]
-name = "iri-string"
-version = "0.7.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbc5ebe9c3a1a7a5127f920a418f7585e9e758e911d0466ed004f393b0e380b2"
-dependencies = [
- "memchr",
- "serde",
-]
-
-[[package]]
 name = "is-terminal"
 version = "0.4.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2520,7 +2521,7 @@ checksum = "e04d7f318608d35d4b61ddd75cbdaee86b023ebe2bd5a66ee0915f0bf93095a9"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2703,7 +2704,7 @@ dependencies = [
  "bity-ic-serializer",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "http_request",
  "ic-cdk 0.18.7",
  "ic-cdk-macros 0.18.7",
@@ -2721,7 +2722,7 @@ name = "management_api_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "types",
  "utils",
@@ -2840,7 +2841,7 @@ checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 name = "nns_governance_canister"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "types",
 ]
@@ -2943,7 +2944,7 @@ dependencies = [
 name = "ogy_sns_rewards_api_canister"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "sns_governance_canister",
  "types",
@@ -2982,7 +2983,7 @@ dependencies = [
  "bity-ic-canister-time",
  "bity-ic-icrc3 0.4.9",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-stable-structures",
  "icrc-ledger-types",
@@ -2996,7 +2997,7 @@ name = "origyn_nft_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
  "bity-ic-canister-client",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-cdk 0.18.7",
  "origyn_nft_canister",
  "types",
@@ -3132,20 +3133,21 @@ dependencies = [
 
 [[package]]
 name = "pocket-ic"
-version = "9.0.2"
+version = "12.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e523c23bda9dc26ae989aab647b8bd805b54c72a3f2f00d668830d8b490c9c8"
+checksum = "03c0fe19b920be1485cdd3d58a70abfa768c2608f8349864d950791fe1a5c193"
 dependencies = [
  "backoff",
  "base64 0.13.1",
- "candid 0.10.17",
+ "candid 0.10.20",
  "flate2",
  "hex",
  "ic-certification",
- "ic-management-canister-types",
+ "ic-management-canister-types 0.5.0",
  "ic-transport-types 0.40.1",
  "reqwest",
  "schemars 0.8.22",
+ "semver",
  "serde",
  "serde_bytes",
  "serde_cbor",
@@ -3329,7 +3331,7 @@ dependencies = [
  "once_cell",
  "socket2 0.5.10",
  "tracing",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3507,9 +3509,9 @@ checksum = "caf4aa5b0f434c91fe5c7f1ecb6a5ece2130b02ad2a590589dda5146df959001"
 
 [[package]]
 name = "reqwest"
-version = "0.12.23"
+version = "0.12.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d429f34c8092b2d42c7c93cec323bb4adeb7c67698f70839adec842ec10c7ceb"
+checksum = "eddd3ca559203180a307f12d114c268abf583f59b03cb906fd0b3ff8646c1147"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -3797,6 +3799,9 @@ name = "semver"
 version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e6fa9c48d24d85fb3de5ad847117517440f6beceb7798af16b4a87d616b8d0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "serde"
@@ -4045,7 +4050,7 @@ version = "0.1.0"
 dependencies = [
  "bity-ic-candid-gen",
  "bity-ic-canister-time",
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-stable-structures",
  "serde",
@@ -4067,7 +4072,7 @@ dependencies = [
 name = "sns_index_canister"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "serde_bytes",
 ]
@@ -4077,7 +4082,7 @@ name = "sns_ledger_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-candid-gen",
- "candid 0.10.17",
+ "candid 0.10.20",
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
@@ -4096,7 +4101,7 @@ dependencies = [
  "bity-ic-serializer",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "enum_dispatch",
  "futures",
  "http_request",
@@ -4123,7 +4128,7 @@ name = "sns_neuron_controller_api_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "sns_governance_canister",
  "types",
@@ -4141,7 +4146,7 @@ dependencies = [
  "bity-ic-serializer",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "http_request",
  "ic-cdk 0.18.7",
@@ -4171,7 +4176,7 @@ version = "0.1.0"
 dependencies = [
  "bity-ic-canister-time",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-stable-structures",
  "icrc-ledger-types",
  "num-bigint",
@@ -4194,7 +4199,7 @@ name = "sns_root_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-candid-gen",
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "serde_bytes",
  "types",
@@ -4205,7 +4210,7 @@ name = "sns_swap_canister"
 version = "0.1.0"
 dependencies = [
  "bity-ic-candid-gen",
- "candid 0.10.17",
+ "candid 0.10.20",
  "serde",
  "serde_bytes",
  "types",
@@ -4257,7 +4262,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4349,7 +4354,7 @@ checksum = "734676eb262c623cec13c3155096e08d1f8f29adce39ba17948b18dad1e54142"
 name = "super_stats_v3"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-cdk 0.18.7",
  "ic-cdk-macros 0.18.7",
@@ -4365,7 +4370,7 @@ dependencies = [
 name = "super_stats_v3_api"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-cdk 0.18.7",
  "ic-stable-memory",
@@ -4583,7 +4588,7 @@ dependencies = [
  "bity-ic-serializer",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "futures",
  "hex",
  "http_request",
@@ -4610,7 +4615,7 @@ name = "token_metrics_api"
 version = "0.1.0"
 dependencies = [
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "ic-ledger-types",
  "ic-stable-structures",
  "icrc-ledger-types",
@@ -4708,20 +4713,20 @@ dependencies = [
 
 [[package]]
 name = "tower-http"
-version = "0.6.6"
+version = "0.6.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adc82fd73de2a9722ac5da747f12383d2bfdb93591ee6c58486e0097890f05f2"
+checksum = "4cfcf7e2740e6fc6d4d688b4ef00650406bb94adf4731e43c096c3a19fe40840"
 dependencies = [
  "bitflags",
  "bytes",
  "futures-util",
  "http",
  "http-body",
- "iri-string",
  "pin-project-lite",
  "tower",
  "tower-layer",
  "tower-service",
+ "url",
 ]
 
 [[package]]
@@ -4845,7 +4850,7 @@ checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
 name = "types"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-stable-structures",
  "icrc-ledger-types",
@@ -4921,7 +4926,7 @@ dependencies = [
  "bity-ic-canister-time",
  "bity-ic-stable-memory",
  "bity-ic-types",
- "candid 0.10.17",
+ "candid 0.10.20",
  "hex",
  "ic-cdk 0.18.7",
  "icrc-ledger-types",
