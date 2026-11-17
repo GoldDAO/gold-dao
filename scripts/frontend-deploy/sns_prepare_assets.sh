@@ -23,13 +23,18 @@ run_prepare() {
   fi
 }
 
-run_prepare
+# The CI job shell runs with `set -eo pipefail`, so a failing dfx run would end the job before the
+# stale-batch check below gets to read its output.
+if ! run_prepare; then
+  echo "dfx deploy --by-proposal failed, checking the output for a proposed batch left by an earlier run."
+fi
 
 # A batch left in "proposed" state by an earlier run (for example a deploy job that failed after the
 # upload) blocks every new batch: "Batch N is already proposed. Delete or execute it to propose another."
 # Delete it and retry only when the operator asks for it with the job variable DELETE_PROPOSED_BATCH=true,
 # because a proposed batch may belong to a proposal that is still being voted on.
-STALE_BATCH=$(grep -o "Batch [0-9]* is already proposed" $LOG_FILE | awk '{print $2}' | head -n 1)
+# `|| true`: under pipefail a grep with no match would otherwise end the job here.
+STALE_BATCH=$(grep -o "Batch [0-9]* is already proposed" $LOG_FILE | awk '{print $2}' | head -n 1 || true)
 
 if [[ -n $STALE_BATCH ]]; then
   if [[ $DELETE_PROPOSED_BATCH == "true" ]]; then
