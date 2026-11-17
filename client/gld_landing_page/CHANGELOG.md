@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.0.11] - 2026-11-17
+
+### Changed
+
+- Dashboard links point to app.gold-dao.org; the GLDT buy link opens gldt.org
+
 ### [1.0.10] - 2026-10-27
 
 ### Changed

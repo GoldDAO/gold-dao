@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.4.0] - 2026-11-17
+
+#### Changed
+
+- Rebrand the app from GLDT to Gold DAO: title "Gold DAO dApp", Gold DAO logo and wordmark, favicon, description and Open Graph tags
+- Add `app.gold-dao.org` as custom domain and Internet Identity alternative origin; `app.gldt.org` stays listed during the transition
+- Point the Docs link to docs.gold-dao.org and the "Buy GLDT" button in the burn flow to gldt.org
+- `pnpm dev` now runs against the mainnet canisters (`.env.development`)
+
+#### Fix
+
+- `deploy:staging` and `deploy:preprod` deployed `gldt_swap_app` instead of `gld_dashboard`
+
 ### [2.3.3] - 2026-10-27
 
 #### Fix

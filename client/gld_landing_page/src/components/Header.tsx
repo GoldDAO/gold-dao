@@ -113,7 +113,7 @@ const Navigation: React.FC<NavigationProps> = ({ links }) => (
 
 const DashboardButton: React.FC = () => (
   <a
-    href='https://app.gldt.org/'
+    href='https://app.gold-dao.org/'
     target='_blank'
     className='main-button text-white font-semibold text-[16px] leading-[24px] md:block hidden'
   >
@@ -154,7 +154,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </a>
         ))}
         <a
-          href='https://app.gldt.org/'
+          href='https://app.gold-dao.org/'
           target='_blank'
           className='secondary-button text-center font-semibold w-full mt-4'
         >

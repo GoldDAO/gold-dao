@@ -22,8 +22,8 @@ All the backend canisters are included in the folder [`backend/canisters`](backe
 
 The frontend canisters of the project are included in the folder [`client`](client/)
 
-- [`landing_page`](client/landing_page/): Contains the NextJS frontend for the [gldt.org landing page](https://gldt.org).
-- [`explorer`](client/explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
+- [`gld_dashboard`](client/gld_dashboard/): Vite/React frontend for the [Gold DAO dApp](https://app.gold-dao.org) (governance, rewards, wallet).
+- [`gld_landing_page`](client/gld_landing_page/): NextJS frontend for the [gold-dao.org landing page](https://www.gold-dao.org).
 
 ## Local development instructions
 
