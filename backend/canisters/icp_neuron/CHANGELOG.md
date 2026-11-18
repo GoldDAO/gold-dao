@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.8] - 2026-11-18
+
+#### Changed
+
+- The candid library the canister is built with goes from 0.10.17 to 0.10.20. The canister interface does not change.
+
 #### Removed
 
 - The job that set the NNS neurons to public visibility each time the canister started. Version 1.1.5 added it for a single run, which made the Gold DAO neuron public. Neurons spawned for the reward payouts keep the NNS default (private).
