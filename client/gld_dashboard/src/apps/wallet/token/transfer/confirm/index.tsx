@@ -91,20 +91,23 @@ const Confirm = ({ className }: { className?: string }) => {
                   <div>
                     <E8sToLocaleString
                       value={amount + tokenData.data.fee_e8s}
+                      tokenDecimals={tokenData.data.decimals}
                       decimals={tokenData.data.decimals}
                     />{" "}
                     {token.name}
                   </div>
-                  <div className="text-content/60">
-                    ≈ $
-                    <NumberToLocaleString
-                      value={
-                        (Number(amount + tokenData.data.fee_e8s) /
-                          10 ** tokenData.data.decimals) *
-                        tokenData.data.price_usd
-                      }
-                    />
-                  </div>
+                  {tokenData.data.has_price && (
+                    <div className="text-content/60">
+                      ≈ $
+                      <NumberToLocaleString
+                        value={
+                          (Number(amount + tokenData.data.fee_e8s) /
+                            10 ** tokenData.data.decimals) *
+                          tokenData.data.price_usd
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -114,14 +117,16 @@ const Confirm = ({ className }: { className?: string }) => {
                   <div>
                     <NumberToLocaleString
                       value={tokenData.data.fee}
-                      decimals={4}
+                      decimals={token.is_custom ? 8 : 4}
                     />{" "}
                     {token.name}
                   </div>
-                  <div>
-                    ≈ $
-                    <NumberToLocaleString value={tokenData.data.fee_usd} />
-                  </div>
+                  {tokenData.data.has_price && (
+                    <div>
+                      ≈ $
+                      <NumberToLocaleString value={tokenData.data.fee_usd} />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -133,19 +138,22 @@ const Confirm = ({ className }: { className?: string }) => {
                   <div>
                     <E8sToLocaleString
                       value={amount}
+                      tokenDecimals={tokenData.data.decimals}
                       decimals={tokenData.data.decimals}
                     />{" "}
                     {token.name}
                   </div>
-                  <div className="text-content/60">
-                    ≈ $
-                    <NumberToLocaleString
-                      value={
-                        (Number(amount) / 10 ** tokenData.data.decimals) *
-                        tokenData.data.price_usd
-                      }
-                    />
-                  </div>
+                  {tokenData.data.has_price && (
+                    <div className="text-content/60">
+                      ≈ $
+                      <NumberToLocaleString
+                        value={
+                          (Number(amount) / 10 ** tokenData.data.decimals) *
+                          tokenData.data.price_usd
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

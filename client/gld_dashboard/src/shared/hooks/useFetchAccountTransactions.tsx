@@ -38,7 +38,7 @@ const useFetchAccountTransactions = (
   } = args;
 
   return useInfiniteQuery({
-    queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", ledger, account],
+    queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", ledger, account, canisterId],
     queryFn: async ({ pageParam = null }) => {
       try {
         const decodedAccount = decodeIcrcAccount(account);

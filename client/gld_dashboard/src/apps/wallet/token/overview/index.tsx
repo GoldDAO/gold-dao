@@ -1,3 +1,4 @@
+import { useState } from "react";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -18,6 +19,9 @@ import AppFeatureBtn from "@shared/components/app-feature-btn";
 import BurnNFT from "@wallet/nft/mint-burn/burn";
 import MintNFT from "@wallet/nft/mint-burn/mint";
 import SwapNFTReducerAtom from "@wallet/nft/mint-burn/atoms/SwapNFTAtom";
+import RemoveCustomTokenDialog from "@wallet/token/custom/remove-dialog";
+import Icon from "@shared/ui/icons";
+import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
 
 const Overview = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -26,6 +30,8 @@ const Overview = () => {
   const setTransferTokenState = useSetAtom(TransferTokenStateAtom);
   const setSendTokenState = useSetAtom(SendTokenStateAtom);
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const { copyToClipboard } = useCopyToClipboard();
 
   const balance = useFetchLedgerBalance(
     token.canister_id,
@@ -65,6 +71,7 @@ const Overview = () => {
           token={token}
           amount={balance.data.balance}
           amountUSD={balance.data.balance_usd}
+          hasPrice={balance.data.has_price}
         />
       );
     }
@@ -88,6 +95,19 @@ const Overview = () => {
           <AppFeatureBtn
             action="earn"
             handleOnClick={() => navigate("/earn")}
+          />
+        </>
+      );
+    } else if (token.is_custom) {
+      return (
+        <>
+          <AppFeatureBtn
+            action="transfer"
+            handleOnClick={handleOpenTransferTokenDialog}
+          />
+          <AppFeatureBtn
+            action="remove-token"
+            handleOnClick={() => setIsRemoveDialogOpen(true)}
           />
         </>
       );
@@ -127,6 +147,19 @@ const Overview = () => {
                 token={token}
               />
               {renderUserBalance()}
+              {token.is_custom && (
+                <div className="flex items-center gap-2 mt-3 text-sm text-content/60">
+                  <div>Ledger</div>
+                  <div className="break-all">{token.canister_id}</div>
+                  <button
+                    className="shrink-0 cursor-pointer"
+                    aria-label="Copy the ledger canister ID"
+                    onClick={() => copyToClipboard(token.canister_id)}
+                  >
+                    <Icon.Copy width={16} height={16} />
+                  </button>
+                </div>
+              )}
             </div>
 
             <WalletListMobile className="flex justify-center xl:hidden mt-6 mb-8" />
@@ -138,6 +171,11 @@ const Overview = () => {
         </div>
       </GradientCard>
       <TransferDialogToken />
+      <RemoveCustomTokenDialog
+        token={token}
+        open={isRemoveDialogOpen && !!token.is_custom}
+        handleClose={() => setIsRemoveDialogOpen(false)}
+      />
       <BurnNFT />
       <MintNFT />
     </>

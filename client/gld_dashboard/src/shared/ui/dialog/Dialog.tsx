@@ -19,12 +19,15 @@ const SIZES = {
 
 const BackIcon = ({ handleOnClick }: { handleOnClick: () => void }) => {
   return (
-    <div
-      className="p-1 rounded-full cursor-pointer hover:bg-primary hover:text-white"
+    <button
+      type="button"
+      aria-label="Back"
+      className="shrink-0 p-1 rounded-full cursor-pointer hover:bg-primary hover:text-white"
       onClick={handleOnClick}
     >
-      <Icon.Chevron className="rotate-90" />
-    </div>
+      {/* Without a size the icon collapses to nothing. */}
+      <Icon.Chevron width={18} height={18} className="rotate-90" />
+    </button>
   );
 };
 

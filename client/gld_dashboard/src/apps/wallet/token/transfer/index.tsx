@@ -43,7 +43,7 @@ const TransferTokenDialog = () => {
       open={is_open_transfer_dialog}
       handleOnClose={handleCloseTransferDialog}
       size={transfer_tab === "receive" ? "md" : "xxl"}
-      handlePreviousStep={is_send_confirm ? () => handleBackConfirm : undefined}
+      handlePreviousStep={is_send_confirm ? handleBackConfirm : undefined}
     >
       {is_step_send_form && (
         <div className="flex justify-center mb-12">

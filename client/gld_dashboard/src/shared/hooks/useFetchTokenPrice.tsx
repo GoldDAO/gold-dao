@@ -9,7 +9,7 @@ import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
-import get_token_price_usd from "@services/icpswap/get_token_price_usd";
+import { get_token_price_usd_or_null } from "@services/icpswap/get_token_price_usd";
 
 const useFetchTokenPrice = (
   agent: Agent | HttpAgent | undefined,
@@ -21,6 +21,8 @@ const useFetchTokenPrice = (
       decimals: number;
       fee: bigint;
       amount_usd: number;
+      // False for a token the user added that has no price; amount_usd is 0.
+      has_price: boolean;
     }>,
     "queryKey" | "queryFn"
   > & {
@@ -66,12 +68,13 @@ const useFetchTokenPrice = (
         const fee = await icrc1_fee(actorTokenLedger);
         const decimals = await icrc1_decimals(actorTokenLedger);
 
-        const priceUSD = await get_token_price_usd(
+        const price = await get_token_price_usd_or_null(
           actorIcpswap,
           from_canister_id,
           from,
           { agent }
         );
+        const priceUSD = price ?? 0;
 
         return {
           from: from,
@@ -80,6 +83,7 @@ const useFetchTokenPrice = (
           decimals,
           fee,
           amount_usd: (amount_number / 10 ** decimals) * priceUSD,
+          has_price: price !== null,
         };
       } catch (err) {
         console.log(err);
