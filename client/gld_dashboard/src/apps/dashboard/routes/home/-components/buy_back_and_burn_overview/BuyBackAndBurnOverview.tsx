@@ -7,7 +7,8 @@ import BurnOverview from "./-components/BurnOverview";
 
 const BuyBackAndBurnOverview = ({ className }: { className?: string }) => {
   const { t } = useTranslation("dashboard/buy_back_and_burn_overview");
-  const goldDAOKnowledgeHubURL = "https://docs.gold-dao.org/";
+  const goldDAOKnowledgeHubURL =
+    "https://www.gold-dao.org/docs/buyback-and-burn/";
 
   return (
     <div className={className}>

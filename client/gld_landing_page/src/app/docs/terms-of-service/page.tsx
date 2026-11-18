@@ -3,8 +3,14 @@ import { docsMetadata } from '@/docs/metadata'
 
 export const metadata = docsMetadata('terms-of-service')
 
-// The wording is the one published on docs.gold-dao.org, without its last
-// section, "14. Contact". Gold DAO is a DAO and names no contact.
+// The wording is the one published on docs.gold-dao.org, with these changes
+// from November 2026:
+// - Sections 2, 5 and 6 named GLDT as a token of Gold DAO. GLDT is run by
+//   ORIGYN now. They speak of GOLDAO, and of the reward tokens as tokens of
+//   third parties.
+// - The last section, "14. Contact", is gone. Gold DAO is a DAO and names no
+//   contact.
+// - The date of the last change is stated.
 export default function Page () {
   return (
     <DocsPage
@@ -22,6 +28,9 @@ export default function Page () {
       }
     >
       <p>If you do not agree to these Terms, do not use our Services.</p>
+      <p>
+        <strong>Last updated:</strong> 18 November 2026
+      </p>
 
       <h2>1. Eligibility</h2>
       <ul>
@@ -44,13 +53,12 @@ export default function Page () {
       <ul>
         <li>
           Gold DAO facilitates decentralized access to digital assets,
-          including the <strong>GOLDAO token</strong> and{' '}
-          <strong>GLDT token</strong> and related smart contract protocols.
+          including the <strong>GOLDAO token</strong> and related smart
+          contract protocols.
         </li>
         <li>
-          The Services may involve staking, reward distribution, governance
-          participation, and representations of real-world assets (RWA), such
-          as gold-backed tokens.
+          The Services may involve staking, reward distribution, and governance
+          participation.
         </li>
         <li>
           We do not guarantee uninterrupted access, error-free operation, or
@@ -98,20 +106,20 @@ export default function Page () {
       <h2>5. Token Usage</h2>
       <ul>
         <li>
-          The <strong>GLDT token</strong> is a blockchain-based digital asset
-          and does not represent legal ownership of physical gold or any equity
+          The <strong>GOLDAO token</strong> is a blockchain-based digital asset
+          used for the governance of Gold DAO. It does not represent any equity
           in Gold DAO.
         </li>
         <li>
-          While GLDT may be backed or collateralized by gold reserves,{' '}
+          Rewards are paid in tokens that third parties issue and operate.{' '}
           <strong>
-            Gold DAO makes no guarantee of redemption, convertibility, or
-            liquidity
+            Gold DAO makes no guarantee of rewards, or of the backing,
+            redemption, convertibility, or liquidity of any token
           </strong>
           .
         </li>
         <li>
-          The value of GLDT and other tokens may fluctuate significantly,
+          The value of GOLDAO and other tokens may fluctuate significantly,
           including a total loss of value.
         </li>
       </ul>
@@ -137,12 +145,12 @@ export default function Page () {
           credentials will result in permanent loss of assets.
         </li>
         <li>
-          <strong>Regulatory Risk</strong>: Digital assets and RWAs may be
-          subject to evolving laws and regulations. Access to the Services may
-          be restricted, suspended, or prohibited in certain jurisdictions.
+          <strong>Regulatory Risk</strong>: Digital assets may be subject to
+          evolving laws and regulations. Access to the Services may be
+          restricted, suspended, or prohibited in certain jurisdictions.
         </li>
         <li>
-          <strong>Liquidity Risk</strong>: GLDT and other tokens may not have
+          <strong>Liquidity Risk</strong>: GOLDAO and other tokens may not have
           continuous market liquidity, making it difficult or impossible to
           buy, sell, or exchange assets at a given price.
         </li>
@@ -152,9 +160,11 @@ export default function Page () {
           Services or cause asset losses.
         </li>
         <li>
-          <strong>Counterparty &amp; Collateral Risk</strong>: While GLDT may be
-          linked to audited gold reserves, Gold DAO cannot guarantee against
-          risks related to custodians, vault operators, or other third parties.
+          <strong>Counterparty Risk</strong>: The treasury of the DAO is staked
+          in protocols that third parties operate, and rewards are paid in
+          tokens that third parties issue. Gold DAO cannot guarantee against
+          risks related to these protocols, issuers, custodians, or other third
+          parties.
         </li>
         <li>
           <strong>Governance Risk</strong>: Participation in DAO governance

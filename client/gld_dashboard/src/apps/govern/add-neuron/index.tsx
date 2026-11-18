@@ -44,7 +44,7 @@ const AddNeuron = ({
             In order to add a neuron to the Gold DAO dApp, you need to own a
             GOLDAO neuron. Follow the steps described in{" "}
             <a
-              href="https://docs.gold-dao.org/how-to/stake-the-goldao-tokens"
+              href="https://www.gold-dao.org/docs/stake-goldao/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center hover:underline text-copper"
