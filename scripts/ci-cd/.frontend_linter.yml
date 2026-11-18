@@ -15,9 +15,8 @@ spec:
 # workspace that every app reads. A list of file extensions misses things that
 # change the build: the .env files, the lockfile, images, the locale files of
 # the landing page, .npmrc and public/.well-known/ii-alternative-origins.
-# The root pnpm-lock.yaml is not in the lists: .npmrc sets
-# shared-workspace-lockfile=false, so pnpm reads the lockfile in the app folder
-# and never the root one.
+# There is no lockfile at the root: .npmrc sets shared-workspace-lockfile=false,
+# so every app has its lockfile in its own folder.
 
 $[[ inputs.src-folder ]] linter:
   stage: lint
