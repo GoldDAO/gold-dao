@@ -32,6 +32,51 @@ interface UseFetchLedgerBalanceOptions
 
 type UseFetchLedgerBalanceResult = UseQueryResult<LedgerBalanceData, Error>;
 
+// Key and fetcher of a ledger balance query, shared by useFetchLedgerBalance
+// and by hooks that read several balances at once.
+const ledgerBalanceQuery = (
+  canisterId: string,
+  agent: Agent | HttpAgent | undefined,
+  { ledger, owner }: { ledger: string; owner: string }
+) => ({
+  queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner, canisterId],
+  queryFn: async (): Promise<LedgerBalanceData> => {
+    const actorLedger = Actor.createActor(idlFactoryLedger, {
+      agent,
+      canisterId,
+    });
+
+    const balance_e8s = await icrc1_balance_of({
+      actor: actorLedger,
+      owner,
+    });
+    const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
+      agent,
+      canisterId: ICPSWAP_CANISTER_ID,
+    });
+    const fee_e8s = await icrc1_fee(actorLedger);
+    const decimals = await icrc1_decimals(actorLedger);
+
+    const price_usd = await get_token_price_usd(
+      actorIcpswap, canisterId, ledger, { agent }
+    );
+    const fee = Number(fee_e8s) / 10 ** decimals;
+    const balance = Number(balance_e8s) / 10 ** decimals;
+    const balance_usd = balance * price_usd;
+
+    return {
+      balance,
+      balance_e8s,
+      balance_usd,
+      decimals,
+      fee,
+      fee_e8s,
+      fee_usd: fee * price_usd,
+      price_usd,
+    };
+  },
+});
+
 const useFetchLedgerBalance = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
@@ -51,42 +96,7 @@ const useFetchLedgerBalance = (
   } = options;
 
   return useQuery<LedgerBalanceData>({
-    queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner, canisterId],
-    queryFn: async (): Promise<LedgerBalanceData> => {
-      const actorLedger = Actor.createActor(idlFactoryLedger, {
-        agent,
-        canisterId,
-      });
-
-      const balance_e8s = await icrc1_balance_of({
-        actor: actorLedger,
-        owner,
-      });
-      const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
-        agent,
-        canisterId: ICPSWAP_CANISTER_ID,
-      });
-      const fee_e8s = await icrc1_fee(actorLedger);
-      const decimals = await icrc1_decimals(actorLedger);
-
-      const price_usd = await get_token_price_usd(
-        actorIcpswap, canisterId, ledger, { agent }
-      );
-      const fee = Number(fee_e8s) / 10 ** decimals;
-      const balance = Number(balance_e8s) / 10 ** decimals;
-      const balance_usd = balance * price_usd;
-
-      return {
-        balance,
-        balance_e8s,
-        balance_usd,
-        decimals,
-        fee,
-        fee_e8s,
-        fee_usd: fee * price_usd,
-        price_usd,
-      };
-    },
+    ...ledgerBalanceQuery(canisterId, agent, { ledger, owner }),
     placeholderData,
     enabled,
     refetchInterval,
@@ -99,6 +109,7 @@ const useFetchLedgerBalance = (
 };
 
 export default useFetchLedgerBalance;
+export { ledgerBalanceQuery };
 export type {
   LedgerBalanceData,
   UseFetchLedgerBalanceOptions,

@@ -5,9 +5,10 @@ import { useAuth } from "@auth/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import WalletList from "@wallet/wallet-list";
 import WalletListDisconnected from "@wallet/wallet-list-disconnected";
+import WalletTotal from "@wallet/wallet-total";
 import TxHistoryToken from "@wallet/token/tx-history";
 import TxHistoryDisconnected from "@wallet/shared/components/tx-history-disconnected";
-import { TOKENS, TOKEN_WHITELIST, TOKEN_GLDT } from "@shared/utils/tokens";
+import { TOKENS, TOKEN_WHITELIST, TOKEN_GOLDAO } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import OverviewToken from "@wallet/token/overview";
@@ -34,8 +35,8 @@ const Wallet = () => {
       !searchParams.get("token") ||
       !TOKEN_WHITELIST.includes(searchParams.get("token")!)
     ) {
-      setSelectedToken(TOKEN_GLDT);
-      setSearchParams({ token: TOKEN_GLDT.display_name });
+      setSelectedToken(TOKEN_GOLDAO);
+      setSearchParams({ token: TOKEN_GOLDAO.display_name });
     } else {
       if (searchParams.get("token") !== "GLDNFT") {
         setSelectedToken(
@@ -54,6 +55,7 @@ const Wallet = () => {
         <div className="text-center xl:text-left text-4xl xl:text-6xl text-gold font-semibold">
           Wallet
         </div>
+        <WalletTotal className="mt-3" />
         <div className="hidden xl:block">
           <div className="border border-border p-4 rounded-xl my-4">
             <div className="text-center xl:text-left mb-4 text-copper text-sm font-semibold">

@@ -85,6 +85,10 @@ const Overview = () => {
               dispatchSwapNFT({ type: "INIT_BURN_MODE" });
             }}
           />
+          <AppFeatureBtn
+            action="earn"
+            handleOnClick={() => navigate("/earn")}
+          />
         </>
       );
     } else if (token.id === "goldao") {
