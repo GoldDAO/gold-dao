@@ -17,6 +17,6 @@
     "stop": "dfx stop",
     "test": "pnpm run build:backdid && cargo tarpaulin --count -o html",
     "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'",
-    "clean:client": "rm -rf client/*/pnpm-lock.yaml client/*/node_modules client/*/.next client/*/dist client/*/next-env.d.ts .pnpm-store"
+    "clean:client": "rm -rf client/*/node_modules client/*/.next client/*/dist client/*/next-env.d.ts .pnpm-store"
   }
 }
