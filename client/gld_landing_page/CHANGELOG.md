@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.1.1] - 2026-11-18
+
+### Changed
+
+- Terms of Service: the sections that named GLDT as a token of Gold DAO (services, token usage, risks) now speak of GOLDAO and treat the reward tokens as tokens of third parties. The date of the last change is stated.
+- Privacy Policy: rewritten. The old text only covered a newsletter sign-up that the website does not have. The new one says what the website and the Gold DAO app store in the browser, what ends up on the blockchain and which third parties are involved.
+
 ### [2.1.0] - 2026-11-18
 
 ### Added
