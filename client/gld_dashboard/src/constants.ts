@@ -59,9 +59,7 @@ export const GLDT_STAKE_CANISTER_ID = import.meta.env
 
 export const VERSION_DAPP = import.meta.env.VITE_VERSION;
 
-export const BITY_GOLD_API_BASE_URL = import.meta.env
-  .VITE_BITY_GOLD_API_BASE_URL;
-
+export const GLDT_API_BASE_URL = "https://api.gldt.org/v1";
 export const ICP_ICRC_API_BASE_URL =
   "https://icrc-api.internetcomputer.org/api/v1";
 export const OGY_API_BASE_URL = "https://api.origyn.com";
@@ -106,12 +104,6 @@ export const INSTANT_DISSOLVE_FEE_PERCENTAGE = 5;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);
-
-  // if (!BITY_GOLD_API_BASE_URL)
-  //   console.log(
-  //     "No BITY_GOLD_API_BASE_URL environment variable. Set BITY_GOLD_API_BASE_URL environment variable."
-  //   );
-  // else console.log(`BITY_GOLD_API_BASE_URL=${BITY_GOLD_API_BASE_URL}`);
 
   // if (!GLD_NFT_1G_CANISTER_ID)
   //   console.log(
