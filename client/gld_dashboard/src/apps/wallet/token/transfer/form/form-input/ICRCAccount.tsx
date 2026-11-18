@@ -13,7 +13,7 @@ const ICRCAccount = () => {
     control,
     setValue,
     reset,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm({
     mode: "onChange",
     shouldUnregister: true,
@@ -28,17 +28,20 @@ const ICRCAccount = () => {
     defaultValue: "",
   });
 
+  // The send state follows the field: a valid account is the recipient, any
+  // other text leaves no recipient and disables the Transfer button. The text
+  // is checked here, because the form's isValid still holds the result for
+  // the previous text when this effect runs.
   useEffect(() => {
-    if (principal && isValid) {
-      setSendState((state) => ({
-        ...state,
-        receive_account: principal,
-        is_principal_standard: true,
-        is_valid_receive_address: true,
-      }));
-    }
+    const isValidRecipient = isValidPrincipalOrICRCAccount(principal);
+    setSendState((state) => ({
+      ...state,
+      receive_account: isValidRecipient ? principal : "",
+      is_principal_standard: isValidRecipient || state.is_principal_standard,
+      is_valid_receive_address: isValidRecipient,
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isValid, principal]);
+  }, [principal]);
 
   useEffect(() => {
     if (
@@ -57,13 +60,15 @@ const ICRCAccount = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receive_account]);
 
+  // The form shows this message below the inputs. It goes away once the
+  // field is valid again.
   useEffect(() => {
-    if (errors.principal) {
-      setSendState((state) => ({
-        ...state,
-        error_message_receive_address: errors,
-      }));
-    }
+    setSendState((state) => ({
+      ...state,
+      error_message_receive_address: errors.principal
+        ? { principal: errors.principal }
+        : {},
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.principal]);
 

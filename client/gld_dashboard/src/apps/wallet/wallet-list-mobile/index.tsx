@@ -7,6 +7,9 @@ import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
+import { CustomTokensAtom } from "@wallet/shared/atoms/CustomTokensAtom";
+import AddCustomTokenBtn from "@wallet/token/custom/add-btn";
+import TokenLogo from "@shared/components/token-logo";
 import { WALLET_LIST, Token } from "@shared/utils/tokens";
 import ListItemToken from "@wallet/wallet-list/list-item-token";
 import ListItemNFT from "@wallet/wallet-list/list-item-nft";
@@ -100,15 +103,19 @@ const TriggerToken = ({
     <TriggerBaseBtn handleOnClick={handleOnClick}>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1">
-          <Logo name={token.id} className="h-6 w-6" />
+          <TokenLogo token={token} className="h-6 w-6" />
           <div className="font-semibold text-lg">{token.display_name}</div>
         </div>
         <div className="text-sm text-content/60">
           {price.isSuccess ? (
-            <>
-              1 {token.name} ≈ $
-              <NumberToLocaleString value={price.data.amount_usd} />
-            </>
+            price.data.has_price ? (
+              <>
+                1 {token.name} ≈ $
+                <NumberToLocaleString value={price.data.amount_usd} />
+              </>
+            ) : (
+              <div>No price</div>
+            )
           ) : (
             <div>Loading...</div>
           )}
@@ -122,6 +129,7 @@ const WalletListMobile = ({ className }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const token = useAtomValue(TokenSelectedAtom);
+  const customTokens = useAtomValue(CustomTokensAtom);
 
   const handleOnClose = () => {
     setIsOpen(false);
@@ -136,7 +144,7 @@ const WalletListMobile = ({ className }: { className?: string }) => {
       )}
       <Dialog open={isOpen} handleOnClose={handleOnClose} closeEnabled={false}>
         <div className="flex flex-col gap-2 pb-4">
-          {WALLET_LIST.map((item) => (
+          {[...WALLET_LIST, ...customTokens].map((item) => (
             <button
               onClick={handleOnClose}
               key={item === "GLDNFT" ? item : item.display_name}
@@ -148,6 +156,7 @@ const WalletListMobile = ({ className }: { className?: string }) => {
               )}
             </button>
           ))}
+          <AddCustomTokenBtn handleOnClick={handleOnClose} />
         </div>
       </Dialog>
     </div>

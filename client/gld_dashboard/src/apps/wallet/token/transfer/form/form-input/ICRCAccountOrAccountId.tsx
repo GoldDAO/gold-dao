@@ -14,7 +14,7 @@ const ICRCAccountOrAccountId = () => {
     control,
     setValue,
     reset,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm({
     mode: "onChange",
     shouldUnregister: true,
@@ -29,25 +29,33 @@ const ICRCAccountOrAccountId = () => {
     defaultValue: "",
   });
 
+  // The send state follows the field: a valid account is the recipient, any
+  // other text leaves no recipient and disables the Transfer button. The text
+  // is checked here, because the form's isValid still holds the result for
+  // the previous text when this effect runs.
   useEffect(() => {
-    if (watchedPrincipal && isValid) {
-      let is_principal_standard = true;
-
-      if (isValidAccount(watchedPrincipal)) {
-        is_principal_standard = false;
-      }
-      setSendState((state) => ({
-        ...state,
-        receive_account: watchedPrincipal,
-        is_principal_standard: is_principal_standard,
-        is_valid_receive_address: true,
-      }));
-    }
+    const isAccountId = isValidAccount(watchedPrincipal);
+    const isValidRecipient =
+      isAccountId || isValidPrincipalOrICRCAccount(watchedPrincipal);
+    setSendState((state) => ({
+      ...state,
+      receive_account: isValidRecipient ? watchedPrincipal : "",
+      is_principal_standard: isValidRecipient
+        ? !isAccountId
+        : state.is_principal_standard,
+      is_valid_receive_address: isValidRecipient,
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedPrincipal, isValid]);
+  }, [watchedPrincipal]);
 
+  // Puts the recipient back into the field, e.g. on the way back from the
+  // review step.
   useEffect(() => {
-    if (
+    if (isValidAccount(receive_account)) {
+      setValue("principal", receive_account, {
+        shouldValidate: true,
+      });
+    } else if (
       receive_account !== "" &&
       isValidPrincipalOrICRCAccount(receive_account)
     ) {
@@ -63,13 +71,15 @@ const ICRCAccountOrAccountId = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receive_account]);
 
+  // The form shows this message below the inputs. It goes away once the
+  // field is valid again.
   useEffect(() => {
-    if (errors.principal) {
-      setSendState((state) => ({
-        ...state,
-        error_message_receive_address: errors,
-      }));
-    }
+    setSendState((state) => ({
+      ...state,
+      error_message_receive_address: errors.principal
+        ? { principal: errors.principal }
+        : {},
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.principal]);
 

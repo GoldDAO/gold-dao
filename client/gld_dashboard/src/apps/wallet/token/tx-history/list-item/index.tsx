@@ -9,6 +9,7 @@ import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import Address from "@components/strings/Address";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import { amountDisplayDecimals } from "@shared/utils/tokens/custom";
 
 const ListItem = ({
   tx,
@@ -42,6 +43,10 @@ const ListItem = ({
 
   const renderAmount = (amount: bigint | undefined) => {
     if (!decimals.isSuccess) return <div>Loading...</div>;
+    const displayDecimals = amountDisplayDecimals(
+      token,
+      Number(amount ?? 0n) / 10 ** decimals.data
+    );
     if (tx.is_credit) {
       return (
         <div className="text-success">
@@ -49,6 +54,7 @@ const ListItem = ({
           <E8sToLocaleString
             value={amount as bigint}
             tokenDecimals={decimals.data}
+            decimals={displayDecimals}
           />{" "}
           {token.name}
         </div>
@@ -60,6 +66,7 @@ const ListItem = ({
           <E8sToLocaleString
             value={amount as bigint}
             tokenDecimals={decimals.data}
+            decimals={displayDecimals}
           />{" "}
           {token.name}
         </div>
@@ -96,10 +103,12 @@ const ListItem = ({
           <div className="text-right text-lg">{renderAmount(tx.amount)}</div>
           <div className="text-content/60 text-sm text-right">
             {price.isSuccess ? (
-              <>
-                $
-                <NumberToLocaleString value={price.data.amount_usd} />
-              </>
+              price.data.has_price && (
+                <>
+                  $
+                  <NumberToLocaleString value={price.data.amount_usd} />
+                </>
+              )
             ) : (
               <div>Loading...</div>
             )}

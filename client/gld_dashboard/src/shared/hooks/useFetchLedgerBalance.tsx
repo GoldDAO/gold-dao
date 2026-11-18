@@ -11,7 +11,7 @@ import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_poo
 import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
-import get_token_price_usd from "@services/icpswap/get_token_price_usd";
+import { get_token_price_usd_or_null } from "@services/icpswap/get_token_price_usd";
 
 interface LedgerBalanceData {
   balance: number;
@@ -22,6 +22,9 @@ interface LedgerBalanceData {
   fee_usd: number;
   fee_e8s: bigint;
   price_usd: number;
+  // False for a token the user added that has no price. The USD values are 0
+  // then and must not be shown as amounts.
+  has_price: boolean;
 }
 
 interface UseFetchLedgerBalanceOptions
@@ -57,9 +60,10 @@ const ledgerBalanceQuery = (
     const fee_e8s = await icrc1_fee(actorLedger);
     const decimals = await icrc1_decimals(actorLedger);
 
-    const price_usd = await get_token_price_usd(
+    const price = await get_token_price_usd_or_null(
       actorIcpswap, canisterId, ledger, { agent }
     );
+    const price_usd = price ?? 0;
     const fee = Number(fee_e8s) / 10 ** decimals;
     const balance = Number(balance_e8s) / 10 ** decimals;
     const balance_usd = balance * price_usd;
@@ -73,6 +77,7 @@ const ledgerBalanceQuery = (
       fee_e8s,
       fee_usd: fee * price_usd,
       price_usd,
+      has_price: price !== null,
     };
   },
 });

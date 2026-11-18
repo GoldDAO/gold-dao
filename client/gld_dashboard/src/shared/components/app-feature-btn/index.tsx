@@ -10,7 +10,8 @@ type Feature =
   | "redeem"
   | "govern"
   | "mint-nft"
-  | "burn-nft";
+  | "burn-nft"
+  | "remove-token";
 
 const AppFeatureBtn = ({
   action,
@@ -39,6 +40,10 @@ const AppFeatureBtn = ({
     "burn-nft": {
       icon: <Icon.Burn width={24} aria-label="Burn" />,
       text: "Burn",
+    },
+    "remove-token": {
+      icon: <Icon.MinusCircle width={24} aria-label="Remove" />,
+      text: "Remove",
     },
   };
 

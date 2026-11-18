@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
@@ -10,6 +10,8 @@ import TxHistoryToken from "@wallet/token/tx-history";
 import TxHistoryDisconnected from "@wallet/shared/components/tx-history-disconnected";
 import { TOKENS, TOKEN_WHITELIST, TOKEN_GOLDAO } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
+import { CustomTokensAtom } from "@wallet/shared/atoms/CustomTokensAtom";
+import AddCustomTokenDialog from "@wallet/token/custom/add-dialog";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import OverviewToken from "@wallet/token/overview";
 import OverviewNFT from "@wallet/nft/overview";
@@ -29,25 +31,29 @@ const Wallet = () => {
   );
   const [searchParams, setSearchParams] = useSearchParams();
   const setSelectedToken = useSetAtom(TokenSelectedAtom);
+  const customTokens = useAtomValue(CustomTokensAtom);
 
+  // Runs again when the custom tokens change, so that removing the selected
+  // token falls back to GOLDAO.
   useEffect(() => {
-    if (
-      !searchParams.get("token") ||
-      !TOKEN_WHITELIST.includes(searchParams.get("token")!)
-    ) {
+    const param = searchParams.get("token");
+    if (param === "GLDNFT") return;
+
+    const token =
+      param && TOKEN_WHITELIST.includes(param)
+        ? TOKENS.find((t) => t.display_name === param)
+        : customTokens.find((t) => t.display_name === param);
+
+    if (!token) {
       setSelectedToken(TOKEN_GOLDAO);
       setSearchParams({ token: TOKEN_GOLDAO.display_name });
     } else {
-      if (searchParams.get("token") !== "GLDNFT") {
-        setSelectedToken(
-          TOKENS.find((t) => t.display_name === searchParams.get("token"))!
-        );
-        // Supprimer tous les autres paramètres sauf "token"
-        setSearchParams({ token: searchParams.get("token")! });
-      }
+      setSelectedToken(token);
+      // Supprimer tous les autres paramètres sauf "token"
+      setSearchParams({ token: token.display_name });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, customTokens]);
 
   return (
     <InnerAppLayout>
@@ -92,6 +98,7 @@ const Wallet = () => {
           </>
         )}
       </InnerAppLayout.RightPanel>
+      <AddCustomTokenDialog />
     </InnerAppLayout>
   );
 };
