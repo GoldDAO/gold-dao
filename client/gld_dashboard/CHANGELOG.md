@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.4.1] - 2026-11-17
+
+#### Changed
+
+- Drop `app.gldt.org` from the custom domains and the Internet Identity alternative origins; the domain now forwards to app.gold-dao.org at the DNS level
+
 ### [2.4.0] - 2026-11-17
 
 #### Changed
