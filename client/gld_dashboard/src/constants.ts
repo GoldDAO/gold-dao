@@ -90,6 +90,9 @@ export const ICPSWAP_GOLDAO_ICP_POOL_CANISTER_ID_IC =
 export const ICPSWAP_WTN_ICP_POOL_CANISTER_ID_IC =
   "oqn67-kaaaa-aaaag-qj72q-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
+// ICPSwap SwapFactory: looks up the pool of a token pair
+export const ICPSWAP_SWAP_FACTORY_CANISTER_ID_IC =
+  "4mmnk-kiaaa-aaaag-qbllq-cai";
 
 export const GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID =
   "g5je6-yaaaa-aaaap-ahkza-cai";

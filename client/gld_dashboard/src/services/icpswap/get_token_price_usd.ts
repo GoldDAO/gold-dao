@@ -16,6 +16,8 @@ import {
 } from "@constants";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
+import { isBuiltinLedger } from "@shared/utils/tokens";
+import get_icp_pool_price from "./get_icp_pool_price";
 
 import { idlFactory as idlFactorySwapFactory } from "./idls/swap_factory";
 import { Result } from "./interfaces/swap_factory";
@@ -167,12 +169,79 @@ const get_live_quote_price_usd = async (
   return Number(BigInt(amount)) / 10 ** stablecoinDecimals;
 };
 
-const get_token_price_usd = async (
+const PRICE_TTL_MS = 30 * 1000;
+type CachedPrice = { at: number; price: Promise<number | null> };
+const customPrices = new Map<string, CachedPrice>();
+
+// One page asks for the same price many times (every transaction row does), so
+// a price is fetched once and kept for a short time. A fetch that failed is
+// forgotten, and the next call tries again.
+const cachedPrice = (
+  key: string,
+  fetchPrice: () => Promise<number | null>
+): Promise<number | null> => {
+  const cached = customPrices.get(key);
+  if (cached && Date.now() - cached.at < PRICE_TTL_MS) return cached.price;
+
+  const price = fetchPrice();
+  customPrices.set(key, { at: Date.now(), price });
+  price.catch(() => {
+    if (customPrices.get(key)?.price === price) customPrices.delete(key);
+  });
+  return price;
+};
+
+// Query calls fail now and then when a page sends many at once.
+const withRetry = async <T>(
+  run: () => Promise<T>,
+  attempts = 3
+): Promise<T> => {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await run();
+    } catch (error) {
+      if (attempt >= attempts) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+    }
+  }
+};
+
+// USD price of a ledger the app does not ship with: its ICPSwap pool against
+// ICP, times the ICP price. null when the token has no such pool. The ledger
+// is identified by canister ID only; a symbol proves nothing, since any ledger
+// can use any symbol.
+const get_custom_token_price_usd = async (
+  agent: Agent | HttpAgent,
+  tokenCanisterId: string
+): Promise<number | null> => {
+  try {
+    return await cachedPrice(tokenCanisterId, () =>
+      withRetry(async () => {
+        const [icpPerToken, icpPriceUSD] = await Promise.all([
+          get_icp_pool_price(agent, tokenCanisterId),
+          cachedPrice(ICP_LEDGER_CANISTER_ID_IC, () =>
+            get_live_quote_price_usd(agent, ICP_LEDGER_CANISTER_ID_IC)
+          ),
+        ]);
+        if (icpPerToken === null || icpPriceUSD === null) return null;
+        return icpPerToken * icpPriceUSD;
+      })
+    );
+  } catch (error) {
+    // A price that cannot be read must not hide the balance.
+    console.warn(error);
+    return null;
+  }
+};
+
+// Like get_token_price_usd, but null when there is no price. That only happens
+// for a ledger the app does not ship with (a token the user added).
+export const get_token_price_usd_or_null = async (
   actor: ActorSubclass,
   tokenCanisterId: string,
   tokenSymbol?: string,
   options: { agent?: Agent | HttpAgent } = {}
-): Promise<number> => {
+): Promise<number | null> => {
   const { agent } = options;
 
   if (agent) {
@@ -186,8 +255,32 @@ const get_token_price_usd = async (
     }
   }
 
+  if (!isBuiltinLedger(tokenCanisterId)) {
+    return agent ? get_custom_token_price_usd(agent, tokenCanisterId) : null;
+  }
+
   const tokens = await fetch_all_tokens(actor);
   return find_token_price_usd(tokens, tokenCanisterId, tokenSymbol);
+};
+
+const get_token_price_usd = async (
+  actor: ActorSubclass,
+  tokenCanisterId: string,
+  tokenSymbol?: string,
+  options: { agent?: Agent | HttpAgent } = {}
+): Promise<number> => {
+  const price = await get_token_price_usd_or_null(
+    actor,
+    tokenCanisterId,
+    tokenSymbol,
+    options
+  );
+  if (price === null) {
+    throw new Error(
+      `No price found for token ${tokenSymbol ?? tokenCanisterId}`
+    );
+  }
+  return price;
 };
 
 export default get_token_price_usd;

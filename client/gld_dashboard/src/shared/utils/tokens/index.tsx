@@ -47,13 +47,20 @@ export type TokenLabel =
   | "ckUSDC"
   | "Waterneuron";
 
+// The built-in tokens use the TokenID, TokenName and TokenLabel values above.
+// A token the user added by ledger canister ID has id "custom" and takes its
+// symbol and name from the ledger, so these fields are plain strings.
 export interface Token {
-  id: TokenID;
-  name: TokenName;
-  display_name: TokenName;
-  label: TokenLabel;
+  id: TokenID | "custom";
+  // Symbol. Also selects token specific behaviour and price lookups.
+  name: string;
+  // Unique in the wallet; the value of the "token" URL parameter.
+  display_name: string;
+  label: string;
   canister_id: string;
+  // Empty for a custom token that has no index canister.
   canister_id_ledger_index: string;
+  is_custom?: boolean;
 }
 
 export const TOKEN_WHITELIST = [
@@ -184,6 +191,11 @@ export const WALLET_LIST: (Token | "GLDNFT")[] = [
   TOKEN_CKUSDT,
   TOKEN_WTN,
 ];
+
+// True for the ledger of a token the app ships with. Any other ledger is one
+// the user added, or one the app knows nothing about.
+export const isBuiltinLedger = (canisterId: string): boolean =>
+  TOKENS.some((token) => token.canister_id === canisterId);
 
 export const getTokenByDisplayName = (name: TokenName): Token | undefined => {
   return TOKENS.find((token) => token.display_name === name);

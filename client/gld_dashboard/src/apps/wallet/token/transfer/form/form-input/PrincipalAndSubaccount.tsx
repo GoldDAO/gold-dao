@@ -8,7 +8,6 @@ import { useAtom } from "jotai";
 import { isValidPrincipalAndSubaccount } from "@shared/utils/validators/isValidPrincipalAndSubaccount";
 import { SendTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
 import { isValidPrincipalOrICRCAccount } from "@shared/utils/validators/isValidPrincipalOrICRCAccount";
-import { isValidPrincipal } from "@shared/utils/validators/isValidPrincipal";
 import InputCard from "../card";
 
 const PrincipalAndSubaccount = () => {
@@ -16,8 +15,10 @@ const PrincipalAndSubaccount = () => {
     register,
     control,
     setValue,
+    getValues,
+    trigger,
     reset,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm({
     mode: "onChange",
     shouldUnregister: true,
@@ -38,23 +39,29 @@ const PrincipalAndSubaccount = () => {
     defaultValue: "",
   });
 
+  // The send state follows the fields: a valid principal and subaccount are
+  // the recipient, anything else leaves no recipient and disables the
+  // Transfer button.
   useEffect(() => {
-    if (watchedPrincipal && isValidPrincipal(watchedPrincipal)) {
-      const encoded = encodeIcrcAccount({
-        owner: Principal.fromText(watchedPrincipal),
-        subaccount: watchedSubaccount
-          ? Buffer.from(watchedSubaccount, "hex")
-          : [],
-      });
-      setSendState((state) => ({
-        ...state,
-        receive_account: encoded,
-        is_principal_standard: true,
-        is_valid_receive_address: true,
-      }));
-    }
+    const isValidRecipient = isValidPrincipalAndSubaccount(
+      watchedPrincipal,
+      watchedSubaccount
+    );
+    setSendState((state) => ({
+      ...state,
+      receive_account: isValidRecipient
+        ? encodeIcrcAccount({
+            owner: Principal.fromText(watchedPrincipal),
+            subaccount: watchedSubaccount
+              ? Buffer.from(watchedSubaccount, "hex")
+              : [],
+          })
+        : "",
+      is_principal_standard: isValidRecipient || state.is_principal_standard,
+      is_valid_receive_address: isValidRecipient,
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isValid, watchedPrincipal, watchedSubaccount]);
+  }, [watchedPrincipal, watchedSubaccount]);
 
   useEffect(() => {
     if (
@@ -78,13 +85,15 @@ const PrincipalAndSubaccount = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receive_account]);
 
+  // The form shows this message below the inputs. It goes away once the
+  // fields are valid again.
   useEffect(() => {
-    if (errors.principal) {
-      setSendState((state) => ({
-        ...state,
-        error_message_receive_address: errors,
-      }));
-    }
+    setSendState((state) => ({
+      ...state,
+      error_message_receive_address: errors.principal
+        ? { principal: errors.principal }
+        : {},
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.principal]);
 
@@ -98,11 +107,6 @@ const PrincipalAndSubaccount = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const validatePrincipal = (value: string) => {
-    if (isValidPrincipalAndSubaccount(value, watchedSubaccount)) return true;
-    return false;
-  };
 
   return (
     <div>
@@ -123,9 +127,11 @@ const PrincipalAndSubaccount = () => {
               )}
               {...register("principal", {
                 required: "Principal ID is required",
+                // Checked against the subaccount as it is in the form now,
+                // not as it was at the last render.
                 validate: {
-                  validatePrincipal: (v) =>
-                    validatePrincipal(v) ||
+                  validatePrincipal: (v, values) =>
+                    isValidPrincipalAndSubaccount(v, values.subaccount) ||
                     "Invalid Principal ID or Subaccount",
                 },
               })}
@@ -147,7 +153,12 @@ const PrincipalAndSubaccount = () => {
                 "w-full outline-none focus:outline-none focus:ring-0 bg-surface-secondary",
                 "placeholder:text-content/40"
               )}
-              {...register("subaccount", {})}
+              {...register("subaccount", {
+                // The message for both fields hangs on the principal.
+                onChange: () => {
+                  if (getValues("principal")) trigger("principal");
+                },
+              })}
             />
           </InputCard>
         </div>

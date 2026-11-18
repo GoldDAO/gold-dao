@@ -12,13 +12,15 @@ const List = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
   const { ref, inView } = useInView();
   const token = useAtomValue(TokenSelectedAtom);
+  // A custom token can come without an index canister.
+  const hasIndex = token.canister_id_ledger_index !== "";
 
   const txs = useFetchAccountTransactions(
     token.canister_id_ledger_index,
     unauthenticatedAgent,
     {
       account: principalId,
-      enabled: !!unauthenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent && isConnected && hasIndex,
       ledger: token.name,
     }
   );
@@ -34,6 +36,18 @@ const List = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
+
+  if (!hasIndex) {
+    return (
+      <div className="p-4 bg-surface-primary flex justify-center border border-border rounded-xl text-center">
+        <div>
+          The transaction history is not available: {token.name} was added
+          without an index canister. To see it, remove the token and add it
+          again with its index canister ID.
+        </div>
+      </div>
+    );
+  }
 
   if (txs.isPending) {
     return <div>Loading...</div>;

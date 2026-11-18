@@ -22,7 +22,7 @@ const useFetchLedgerDecimals = (
   } = options;
 
   return useQuery({
-    queryKey: ["FETCH_LEDGER_DECIMALS", ledger],
+    queryKey: ["FETCH_LEDGER_DECIMALS", ledger, canisterId],
     queryFn: async () => {
       try {
         const actor = Actor.createActor(idlFactory, {

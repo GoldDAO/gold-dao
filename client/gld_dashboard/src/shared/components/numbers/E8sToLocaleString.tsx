@@ -14,7 +14,9 @@ const E8sToLocaleString = ({
     value !== 0n
       ? num.toLocaleString(locale, {
           minimumFractionDigits: 0,
-          maximumFractionDigits: decimals,
+          // toLocaleString throws above its limit, and a ledger can report
+          // any number of decimals.
+          maximumFractionDigits: Math.min(decimals, 20),
         })
       : "0";
   return result;

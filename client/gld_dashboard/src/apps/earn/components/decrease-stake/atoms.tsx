@@ -50,6 +50,7 @@ const initialState: DecreaseStakeState = {
     fee_usd: 0,
     fee_e8s: 0n,
     price_usd: 0,
+    has_price: true,
   },
 };
 

@@ -5,7 +5,8 @@ import { FieldValues, useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useAuth } from "@auth/index";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import { Logo } from "@components/index";
+import TokenLogo from "@shared/components/token-logo";
+import { formatUnits, parseUnits } from "@shared/utils/numbers/units";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { SendTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
@@ -83,14 +84,17 @@ const Form = ({ className }: { className?: string }) => {
     );
   }
 
+  // The typed amount in the token's smallest unit, or null when the text is
+  // not a number. Converted on the digits, so it is exact for any number of
+  // decimals.
+  const toUnits = (value: string | number) =>
+    parseUnits(String(value), balance.data.decimals);
+
   const getAmount = () => {
-    const value = Number(watchedAmount);
-    if (isNaN(value) || value === 0 || errors?.amount) {
+    const amountValue = toUnits(watchedAmount);
+    if (amountValue === null || amountValue === 0n || errors?.amount) {
       return 0n;
     } else {
-      const amountValue = BigInt(
-        Math.round(value * 10 ** balance.data.decimals)
-      );
       if (amountValue + balance.data.fee_e8s !== balance.data.balance_e8s)
         return amountValue - balance.data.fee_e8s;
       else return amountValue;
@@ -98,25 +102,24 @@ const Form = ({ className }: { className?: string }) => {
   };
 
   const isAmountBelowBalance = (value: string) => {
-    const amount =
-      BigInt(Math.round(parseFloat(value) * 10 ** balance.data.decimals)) +
-      balance.data.fee_e8s;
-    if (amount > balance.data.balance_e8s) return false;
+    const amount = toUnits(value);
+    if (amount === null) return false;
+    if (amount + balance.data.fee_e8s > balance.data.balance_e8s) return false;
     return true;
   };
 
   const isAmountAboveFee = (value: string) => {
-    const amount = BigInt(
-      Math.round(parseFloat(value) * 10 ** balance.data.decimals)
-    );
+    const amount = toUnits(value);
+    if (amount === null) return false;
     if (amount <= balance.data.fee_e8s) return false;
     return true;
   };
 
   const onClickMaxBalance = () => {
-    const amount =
-      Number(balance.data.balance_e8s - balance.data.fee_e8s) /
-      10 ** balance.data.decimals;
+    const amount = formatUnits(
+      balance.data.balance_e8s - balance.data.fee_e8s,
+      balance.data.decimals
+    );
     setValue("amount", amount, {
       shouldValidate: true,
     });
@@ -124,6 +127,9 @@ const Form = ({ className }: { className?: string }) => {
   };
 
   const handleOnSubmit = (data: FieldValues) => {
+    // The Transfer button is disabled without a valid recipient, but a form
+    // can be submitted in other ways.
+    if (!is_valid_receive_address) return;
     setSendState((state) => ({
       ...state,
       amount_input: data.amount,
@@ -165,7 +171,10 @@ const Form = ({ className }: { className?: string }) => {
               </div>
             )}
             <div className="shrink-0">
+              {/* type="button": without it this is the form's submit button,
+                  and switching the input also sent the form. */}
               <button
+                type="button"
                 onClick={handleSwitchAddress}
                 className="w-full px-6 py-3 border border-gold bg-gold/10 font-semibold text-gold text-base rounded-xl"
               >
@@ -188,7 +197,7 @@ const Form = ({ className }: { className?: string }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex items-center justify-center rounded-full bg-surface-secondary h-6 w-6 shrink-0 aspect-square">
-                  <Logo name={token.id} />
+                  <TokenLogo token={token} className="h-6 w-6" />
                 </div>
                 <input
                   id="amount"
@@ -203,6 +212,8 @@ const Form = ({ className }: { className?: string }) => {
                     pattern: /[0-9.]/,
                     required: "Amount is required",
                     validate: {
+                      isValidAmount: (v: string) =>
+                        toUnits(v) !== null || "Enter a valid amount",
                       isAmountBelowBalance: (v: string) =>
                         isAmountBelowBalance(v) ||
                         "Amount must not exceed your balance minus network fees",
@@ -220,12 +231,14 @@ const Form = ({ className }: { className?: string }) => {
                 data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
               />
             </div>
-            <div className="text-content/40 text-sm mt-2 ml-1">
-              $
-              <NumberToLocaleString
-                value={Number(watchedAmount * balance.data.price_usd)}
-              />
-            </div>
+            {balance.data.has_price && (
+              <div className="text-content/40 text-sm mt-2 ml-1">
+                $
+                <NumberToLocaleString
+                  value={Number(watchedAmount * balance.data.price_usd)}
+                />
+              </div>
+            )}
           </InputCard>
           {errors && (
             <p className="text-danger text-sm mt-1">
@@ -245,10 +258,15 @@ const Form = ({ className }: { className?: string }) => {
             <div className="text-content/40">Fee:</div>
             <NumberToLocaleString value={balance.data.fee} decimals={8} />
             <div>{token.name}</div>
-            <div className="text-content/40">
-              ≈ $
-              <NumberToLocaleString value={balance.data.fee_usd} decimals={8} />
-            </div>
+            {balance.data.has_price && (
+              <div className="text-content/40">
+                ≈ $
+                <NumberToLocaleString
+                  value={balance.data.fee_usd}
+                  decimals={8}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
