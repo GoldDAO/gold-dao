@@ -60,9 +60,6 @@ include:
       src-folder: sns_rewards
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
-      src-folder: super_stats_v3
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
       src-folder: gldt_stake
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
@@ -95,9 +92,6 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: gldt_stake
-  # - local: scripts/ci-cd/.canister_deploys.yml
-  #   inputs:
-  #     src-folder: super_stats_v3
   # Frontend deployments
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:

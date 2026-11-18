@@ -1,9 +1,8 @@
 # Rust unit tests
 #
 # One job for the whole workspace. With one job per canister every job compiled
-# the shared dependencies again, once per crate folder of the canister. The
-# tests of super_stats_v3 and token_metrics never ran, and the tests of the
-# crates under backend/libraries only ran when that folder changed.
+# the shared dependencies again, once per crate folder of the canister, and the
+# tests of the crates under backend/libraries only ran when that folder changed.
 # The integration tests have their own jobs (.integration_tests.yml).
 
 rust unit tests:

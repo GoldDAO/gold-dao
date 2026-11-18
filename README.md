@@ -15,8 +15,6 @@ All the backend canisters are included in the folder [`backend/canisters`](backe
 - [`icp_neuron`](backend/canisters/icp_neuron/): The canister that controls the ICP neurons of the Gold DAO.
 - [`sns_neuron_controller`](backend/canisters/sns_neuron_controller/): The canister that controls the SNS neurons of the Gold DAO.
 - [`sns_rewards`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
-- [`super_stats_v3`](backend/canisters/super_stats_v3/): The canister that collects the Gold DAO statistics.
-- [`token_metrics`](backend/canisters/token_metrics/): The canister that collects the Gold NFT metrics.
 
 ### Frontend canisters
 

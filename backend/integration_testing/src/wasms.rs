@@ -27,8 +27,6 @@ lazy_static! {
     pub static ref BUYBACK_BURN: CanisterWasm = get_canister_wasm_from_bin("buyback_burn");
     pub static ref ICP_NEURON: CanisterWasm = get_canister_wasm_from_bin("icp_neuron");
     pub static ref MANAGEMENT: CanisterWasm = get_canister_wasm_from_bin("management");
-    pub static ref SUPER_STATS: CanisterWasm = get_canister_wasm_from_bin("super_stats_v3");
-    pub static ref TOKEN_METRICS: CanisterWasm = get_canister_wasm_from_bin("token_metrics");
     pub static ref GLDT_STAKE: CanisterWasm = get_canister_wasm_from_bin("gldt_stake");
     pub static ref ORIGYN_NFT: CanisterWasm = get_canister_wasm_gz("origyn_nft");
 }
