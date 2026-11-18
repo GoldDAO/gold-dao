@@ -32,34 +32,9 @@
     "ic": "io7gn-vyaaa-aaaak-qcbiq-cai",
     "staging": "g6yny-dyaaa-aaaab-qb2kq-cai"
   },
-  "gldt_ledger": {
-    "ic": "6c7su-kiaaa-aaaar-qaira-cai",
-    "staging": "6uad6-fqaaa-aaaam-abovq-cai"
-  },
-  "gldt_ledger_indexer": {
-    "ic": "oo6x4-xiaaa-aaaap-abrza-cai",
-    "staging": "wusb2-uiaaa-aaaao-a2lca-cai"
-  },
   "gldt_stake": {
     "ic": "sqpxs-piaaa-aaaaj-qneva-cai",
     "staging": "whvny-7yaaa-aaaap-anupa-cai"
-  },
-  "gldt_swap": {
-    "ic": "6f6ua-hqaaa-aaaar-qairq-cai",
-    "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
-  },
-  "gldt_swap_app": {
-    "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
-    "preprod": "wmd7w-pqaaa-aaaai-qplaa-cai",
-    "staging": "qfyvj-4qaaa-aaaam-qbfka-cai"
-  },
-  "gldt_swap_index": {
-    "ic": "jb7af-tiaaa-aaaam-aeyrq-cai",
-    "staging": "h6ee6-3qaaa-aaaak-quluq-cai"
-  },
-  "gldt_swap_old_archive": {
-    "ic": "van23-gaaaa-aaaar-qajmq-cai",
-    "staging": "yx6zg-byaaa-aaaak-qucpq-cai"
   },
   "icp_ledger": {
     "staging": "ete3q-rqaaa-aaaal-qdlva-cai"
@@ -108,8 +83,5 @@
   "super_stats_v3_gldt": {
     "ic": "usw2n-uyaaa-aaaai-aqhzq-cai",
     "staging": "tgkyf-oaaaa-aaaap-qplbq-cai"
-  },
-  "usdg": {
-    "staging": "xmwkz-tiaaa-aaaai-q3kva-cai"
   }
 }

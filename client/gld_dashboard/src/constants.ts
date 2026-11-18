@@ -45,8 +45,6 @@ export const CKUSDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_CKUSDT_LEDGER_INDEX_CANISTER_ID;
 
 export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
-export const SWAP_INDEXER_CANISTER_ID = import.meta.env
-  .VITE_SWAP_INDEXER_CANISTER_ID;
 export const SNS_NEURONS_ICP_CANISTER_ID = import.meta.env
   .VITE_SNS_NEURONS_ICP_CANISTER_ID;
 export const SNS_NEURONS_OGY_CANISTER_ID = import.meta.env
@@ -56,16 +54,12 @@ export const SNS_GOVERNANCE_CANISTER_ID = import.meta.env
   .VITE_SNS_GOVERNANCE_CANISTER_ID;
 export const SNS_REWARDS_CANISTER_ID = import.meta.env
   .VITE_SNS_REWARDS_CANISTER_ID;
-export const SNS_SUPER_STATS_CANISTER_ID = import.meta.env
-  .VITE_SNS_SUPER_STATS_CANISTER_ID;
 export const GLDT_STAKE_CANISTER_ID = import.meta.env
   .VITE_GLDT_STAKE_CANISTER_ID;
 
 export const VERSION_DAPP = import.meta.env.VITE_VERSION;
 
-export const BITY_GOLD_API_BASE_URL = import.meta.env
-  .VITE_BITY_GOLD_API_BASE_URL;
-
+export const GLDT_API_BASE_URL = "https://api.gldt.org/v1";
 export const ICP_ICRC_API_BASE_URL =
   "https://icrc-api.internetcomputer.org/api/v1";
 export const OGY_API_BASE_URL = "https://api.origyn.com";
@@ -110,12 +104,6 @@ export const INSTANT_DISSOLVE_FEE_PERCENTAGE = 5;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);
-
-  // if (!BITY_GOLD_API_BASE_URL)
-  //   console.log(
-  //     "No BITY_GOLD_API_BASE_URL environment variable. Set BITY_GOLD_API_BASE_URL environment variable."
-  //   );
-  // else console.log(`BITY_GOLD_API_BASE_URL=${BITY_GOLD_API_BASE_URL}`);
 
   // if (!GLD_NFT_1G_CANISTER_ID)
   //   console.log(
@@ -253,12 +241,6 @@ if (!(APP_MODE === "production")) {
   //   console.log(
   //     "No SNS_REWARDS_CANISTER_ID environment variable. Set SNS_REWARDS_CANISTER_ID environment variable."
   //   );
-
-  // if (!SNS_SUPER_STATS_CANISTER_ID)
-  //   console.log(
-  //     "No SNS_SUPER_STATS_CANISTER_ID environment variable. Set SNS_SUPER_STATS_CANISTER_ID environment variable."
-  //   );
-  // else console.log(`SNS_SUPER_STATS_CANISTER_ID=${SNS_SUPER_STATS_CANISTER_ID}`);
 
   // if (!GLDT_STAKE_CANISTER_ID)
   //   console.log(

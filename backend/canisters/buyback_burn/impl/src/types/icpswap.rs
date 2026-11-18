@@ -50,7 +50,7 @@ impl SwapClient for ICPSwapClient {
         self.swap(amount, min_amount_out).await
     }
 
-    async fn withdraw(&self, successful_swap: bool, amount: u128) -> Result<u128> {
-        self.withdraw(successful_swap, amount).await
+    async fn withdraw(&self, successful_swap: bool) -> Result<u128> {
+        self.withdraw(successful_swap).await
     }
 }

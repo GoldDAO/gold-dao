@@ -5,23 +5,35 @@ spec:
       options:
         [
           "gld_dashboard",
-          "gldt_swap_app",
           "gld_landing_page",
           "internal_dashboard",
-          "usdg",
         ]
+    deploy-to-preprod:
+      description: Whether to generate the preprod build job for this frontend. Set to "false" when no preprod canister id is registered, same value as for .frontend_deploys.yml.
+      default: "true"
+      options: ["true", "false"]
 ---
 # Frontend builds
+#
+# The "changes" lists name the whole app folder and the two files of the pnpm
+# workspace that every app reads, see the note in .frontend_linter.yml.
 
 $[[ inputs.src-folder ]] staging build:
   stage: build
   rules:
-    - if: ($CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop") || ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop")
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-        - "pnpm-lock.yaml"
+        - "client/$[[ inputs.src-folder ]]/**/*"
         - "pnpm-workspace.yaml"
+        - ".npmrc"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/**/*"
+        - "pnpm-workspace.yaml"
+        - ".npmrc"
+        # A change to the build or deploy jobs is tried on its merge request.
+        # Same list as the deploy jobs, which need this build.
+        - "scripts/ci-cd/.{node_template,dfx_templates,frontend_builds,frontend_deploys}.yml"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -29,7 +41,7 @@ $[[ inputs.src-folder ]] staging build:
     ENV: "staging"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
-    - pnpm --filter $[[ inputs.src-folder ]] install
+    - pnpm --filter $[[ inputs.src-folder ]] install --frozen-lockfile
     - ENV=$ENV VERSION=$VERSION_STRING pnpm --filter $[[ inputs.src-folder ]] run build:staging
     - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$STAGING_URL" > $[[ inputs.src-folder ]]_deploy.env
@@ -48,12 +60,22 @@ $[[ inputs.src-folder ]] staging build:
 $[[ inputs.src-folder ]] preprod build:
   stage: build
   rules:
-    - if: ($CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop") || ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop")
+    # Without a preprod canister there is no preprod deploy that would use the build
+    - if: '"$[[ inputs.deploy-to-preprod ]]" != "true"'
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-        - "pnpm-lock.yaml"
+        - "client/$[[ inputs.src-folder ]]/**/*"
         - "pnpm-workspace.yaml"
+        - ".npmrc"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/**/*"
+        - "pnpm-workspace.yaml"
+        - ".npmrc"
+        # A change to the build or deploy jobs is tried on its merge request.
+        # Same list as the deploy jobs, which need this build.
+        - "scripts/ci-cd/.{node_template,dfx_templates,frontend_builds,frontend_deploys}.yml"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -61,7 +83,7 @@ $[[ inputs.src-folder ]] preprod build:
     ENV: "preprod"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
-    - pnpm --filter $[[ inputs.src-folder ]] install
+    - pnpm --filter $[[ inputs.src-folder ]] install --frozen-lockfile
     - ENV=$ENV VERSION=$VERSION_STRING pnpm --filter $[[ inputs.src-folder ]] run build:preprod
     - PREPROD_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$PREPROD_URL" > $[[ inputs.src-folder ]]_deploy.env
@@ -88,7 +110,7 @@ $[[ inputs.src-folder ]] production build:
     ENV: "prod"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
-    - pnpm --filter $[[ inputs.src-folder ]] install
+    - pnpm --filter $[[ inputs.src-folder ]] install --frozen-lockfile
     - ENV=$ENV VITE_VERSION=$VERSION_STRING pnpm --filter $[[ inputs.src-folder ]] run build:production
     - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$PRODUCTION_URL" > $[[ inputs.src-folder ]]_deploy.env

@@ -1,5 +1,5 @@
 type Account = record { owner : principal; subaccount : opt blob };
-type Args = record { exchange_configs : vec ExchangeJobConfig };
+type Args = record { exchange_configs : vec nat };
 type Args_1 = record {
   destination_account : opt opt Account;
   source_subaccount : opt opt blob;
@@ -54,6 +54,7 @@ type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
 type Result_3 = variant { Ok : Result_2; Err : text };
 type Result_4 = variant { Ok : nat64; Err : text };
+type Result_5 = variant { Ok : text; Err : text };
 type StakeIcpConfig = record {
   destination_account : Account;
   min_amount : nat64;
@@ -84,10 +85,11 @@ type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO; GLDT };
 type Tokens = record { e8s : nat64 };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args_3) -> {
-  add_exchange_jobs : (Args) -> (Response);
   get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
   get_swap : (nat) -> (opt TokenSwap) query;
   icrc10_supported_standards : () -> (vec SupportedStandard) query;
+  remove_exchange_jobs : (Args) -> (Response);
+  remove_exchange_jobs_validate : (Args) -> (Result_5) query;
   update_exchange_config : (Args_1) -> (Response_1);
   update_stake_icp_config : (Args_2) -> (Response_2);
 }

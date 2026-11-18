@@ -1,15 +1,15 @@
 {
   "name": "gldt-monorepo",
-  "description": "GLDT frontend app and GLDT canister",
+  "description": "Gold DAO canisters and frontends",
   "author": "GoldDAO",
   "license": "AGPL-3.0-only",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "build": "pnpm run build:backdid && pnpm run build:back",
-    "build:back": "scripts/build_canister.sh gldt_swap && scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
-    "build:backdid": "scripts/build_canister.sh --wasmonly gldt_swap && scripts/build_canister.sh --wasmonly sns_rewards && pnpm run build:candid && pnpm run build:declarations && pnpm run build:back",
-    "build:candid": "scripts/generate_did.sh gldt_swap && scripts/generate_did.sh sns_rewards",
+    "build:back": "scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
+    "build:backdid": "scripts/build_canister.sh --wasmonly sns_rewards && pnpm run build:candid && pnpm run build:declarations && pnpm run build:back",
+    "build:candid": "scripts/generate_did.sh sns_rewards",
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
     "lint": "pnpm run lint:back",
     "lint:back": "cargo clippy",
@@ -17,6 +17,6 @@
     "stop": "dfx stop",
     "test": "pnpm run build:backdid && cargo tarpaulin --count -o html",
     "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'",
-    "clean:client": "rm -rf client/*/pnpm-lock.yaml client/*/node_modules client/*/.next client/*/dist client/*/next-env.d.ts .pnpm-store"
+    "clean:client": "rm -rf client/*/node_modules client/*/.next client/*/dist client/*/next-env.d.ts .pnpm-store"
   }
 }

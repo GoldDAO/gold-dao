@@ -1,48 +1,34 @@
-spec:
-  inputs:
-    src-folder:
-      description: Name of the source folder, should be the same as the canister's cargo package name.
-      options: [
-          "gldt_swap",
-          "gldt_swap_index",
-          "buyback_burn",
-          "icp_neuron",
-          "sns_rewards",
-          "sns_neuron_controller",
-          "integration_testing",
-          "management",
-          "gldt_swap",
-          "gldt_stake",
-          # "super_stats_v3",
-        ]
----
-# Rust canister unit test with coverage
+# Rust unit tests
+#
+# One job for the whole workspace. With one job per canister every job compiled
+# the shared dependencies again, once per crate folder of the canister. The
+# tests of super_stats_v3 and token_metrics never ran, and the tests of the
+# crates under backend/libraries only ran when that folder changed.
+# The integration tests have their own jobs (.integration_tests.yml).
 
-$[[ inputs.src-folder ]] unit tests:
+rust unit tests:
   stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME == "develop"
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
   extends: .rust template
+  variables:
+    # Without these the job gets the runner defaults: a request of 200Mi and
+    # limits of 2Gi and 1 CPU. The scheduler reserves the request, not the
+    # limit, and the runner node has 7.2 GiB and 3.7 cores.
+    KUBERNETES_MEMORY_REQUEST: "2Gi"
+    KUBERNETES_MEMORY_LIMIT: "5Gi"
+    KUBERNETES_CPU_REQUEST: "1"
+    KUBERNETES_CPU_LIMIT: "2"
+  rules:
+    # Not on the merge request from develop, see the note on "rust lint" in .gitlab-ci.yml
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes: &rust_unit_test_changes
+        - "Cargo.{lock,toml}"
+        # .did: every canister includes its api/can.did at compile time
+        - "backend/libraries/**/*.{rs,toml,did}"
+        - "backend/external_canisters/**/*.{rs,toml,did}"
+        - "backend/canisters/**/*.{rs,toml,did}"
+        # A change to the job itself or to its image is tried on its merge request
+        - "scripts/ci-cd/.{rust_template,canister_unit_test_coverage}.yml"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes: *rust_unit_test_changes
   script:
-    # - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml
-    # - cargo test -p $[[ inputs.src-folder ]]
-  - |
-    set -e
-    status=0
-    for crate in $(find backend/canisters/$[[inputs.src-folder]] -name Cargo.toml -exec dirname {} \;); do
-      echo "📦 Running tests in $crate"
-      (cd "$crate" && cargo test) || status=1
-    done
-    exit $status
-  # coverage: /^\d+.\d+% coverage/
-  # artifacts:
-  #   reports:
-  #     coverage_report:
-  #       coverage_format: cobertura
-  #       path: cobertura.xml
+    - cargo test --workspace --exclude integration_testing

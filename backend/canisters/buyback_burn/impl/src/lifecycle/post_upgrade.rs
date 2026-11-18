@@ -1,32 +1,12 @@
-use std::time::Duration;
-
-use crate::types::GLDT_BUYING_POOL;
+use crate::lifecycle::init_canister;
+use crate::memory::get_upgrades_memory;
+use crate::state::RuntimeState;
 use bity_ic_canister_logger::LogEntry;
 use bity_ic_canister_tracing_macros::trace;
 use bity_ic_stable_memory::get_reader;
-use buyback_burn_api::exchange_job_config::ExchangeJobConfig;
-use buyback_burn_api::icpswap::ICPSwapConfig;
-use buyback_burn_api::post_transfer_action::PostTransferAction;
-use buyback_burn_api::swap_config::ExchangeConfig;
-use buyback_burn_api::swap_constraint::SwapConstraint;
 pub use buyback_burn_api::Args;
-use candid::Principal;
 use ic_cdk_macros::post_upgrade;
-use ic_ledger_types::Tokens;
-use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use tracing::info;
-use types::TokenSymbol;
-use utils::consts::OGY_GOVERNANCE_CANISTER_ID;
-
-use crate::lifecycle::init_canister;
-use crate::memory::get_upgrades_memory;
-use crate::migrations::types::state::RuntimeStateV0;
-use crate::state::RuntimeState;
-
-pub const OGY_NEURON_SUBACCOUNT: Subaccount = [
-    191, 148, 26, 66, 237, 229, 193, 81, 59, 135, 55, 86, 119, 227, 15, 230, 23, 74, 95, 121, 11,
-    229, 133, 2, 144, 24, 46, 191, 163, 181, 247, 77,
-];
 
 #[post_upgrade]
 #[trace]
@@ -43,6 +23,8 @@ fn post_upgrade(args: Args) {
             // NOTE: uncomment these lines if you want to do a normal upgrade
             let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) =
                 bity_ic_serializer::deserialize(reader).unwrap();
+            // NOTE: remove all failed swaps from the active swaps list and archive them
+            let _ = state.data.token_swaps.archive_active_swaps();
 
             // NOTE: uncomment these lines if you want to do an upgrade with migration
             // let (runtime_state_v0, logs, traces): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>) =

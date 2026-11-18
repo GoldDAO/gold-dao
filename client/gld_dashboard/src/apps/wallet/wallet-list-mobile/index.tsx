@@ -7,7 +7,7 @@ import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import { TOKENS, TOKEN_GLDT, Token } from "@shared/utils/tokens";
+import { WALLET_LIST, Token } from "@shared/utils/tokens";
 import ListItemToken from "@wallet/wallet-list/list-item-token";
 import ListItemNFT from "@wallet/wallet-list/list-item-nft";
 import Dialog from "@shared/ui/dialog/Dialog";
@@ -136,15 +136,16 @@ const WalletListMobile = ({ className }: { className?: string }) => {
       )}
       <Dialog open={isOpen} handleOnClose={handleOnClose} closeEnabled={false}>
         <div className="flex flex-col gap-2 pb-4">
-          <button onClick={handleOnClose}>
-            <ListItemToken token={TOKEN_GLDT} />
-          </button>
-          <button onClick={handleOnClose}>
-            <ListItemNFT />
-          </button>
-          {TOKENS.slice(1).map((token) => (
-            <button onClick={handleOnClose} key={token.display_name}>
-              <ListItemToken token={token} />
+          {WALLET_LIST.map((item) => (
+            <button
+              onClick={handleOnClose}
+              key={item === "GLDNFT" ? item : item.display_name}
+            >
+              {item === "GLDNFT" ? (
+                <ListItemNFT />
+              ) : (
+                <ListItemToken token={item} />
+              )}
             </button>
           ))}
         </div>

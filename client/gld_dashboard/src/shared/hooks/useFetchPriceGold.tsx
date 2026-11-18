@@ -3,7 +3,7 @@ import {
   keepPreviousData,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { fetch_gold_price } from "@services/bity_gold_api";
+import { fetch_gold_price } from "@services/gldt_api";
 
 const useFetchPriceGold = (
   options: Omit<UseQueryOptions<number>, "queryKey" | "queryFn">

@@ -22,7 +22,17 @@ use utils::{consts::E8S_PER_ICP, env::Environment};
 // Refresh daily to distribute potential rewards but add 1 minute offset to leave enough time in case a neuron is spawned
 const REFRESH_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS + MINUTE_IN_MS;
 
-const SPAWN_LIMIT_ICP: u64 = 1000;
+// Maturity above this limit is spawned by the daily job, which pays the rewards out one week
+// later. For one payout per week the limit must satisfy 6 * daily_reward <= limit < 7 * daily_reward,
+// because maturity grows by one NNS reward round per day. Measured in October 2026: neuron
+// 7446549063176501841 earns about 125 ICP per round when it votes on every proposal, so 780 ICP
+// keeps the weekly rhythm for daily rewards between roughly 112 and 130 ICP. Re-tune when the
+// reward rate drifts (NNS reward pool decay, age bonus, missed votes on Governance proposals).
+const SPAWN_LIMIT_ICP: u64 = 780;
+
+// The NNS rejects a spawn when the maturity, after the worst case maturity modulation of -5%,
+// would mint less than the minimum neuron stake of 1 ICP. 1.1 ICP keeps a small margin above that.
+const MIN_SPAWNABLE_MATURITY_E8S: u64 = 110_000_000;
 
 pub fn start_job() {
     run_now_then_interval(Duration::from_millis(REFRESH_NEURONS_INTERVAL), run);
@@ -50,10 +60,7 @@ async fn run_async() {
             let neurons_to_spawn: Vec<_> = response
                 .full_neurons
                 .iter()
-                .filter(|n| {
-                    n.spawn_at_timestamp_seconds.is_none()
-                        && n.maturity_e8s_equivalent > SPAWN_LIMIT_ICP * E8S_PER_ICP
-                })
+                .filter(|n| should_spawn(n))
                 .filter_map(|n| n.id.as_ref().map(|id| id.id))
                 .collect();
 
@@ -114,6 +121,20 @@ async fn run_async() {
             error!("Error fetching neuron list: {err:?}")
         }
     }
+}
+
+/// The maturity of a neuron is spawned once it exceeds the spawn limit. A neuron without stake
+/// (e.g. one that was merged into another neuron and received its trailing voting rewards
+/// afterwards) cannot earn anything more, so its maturity is spawned as soon as the NNS accepts
+/// the amount. Neurons that are already spawning are skipped.
+fn should_spawn(neuron: &Neuron) -> bool {
+    if neuron.spawn_at_timestamp_seconds.is_some() {
+        return false;
+    }
+    let over_spawn_limit = neuron.maturity_e8s_equivalent > SPAWN_LIMIT_ICP * E8S_PER_ICP;
+    let stakeless_leftover = neuron.cached_neuron_stake_e8s == 0
+        && neuron.maturity_e8s_equivalent >= MIN_SPAWNABLE_MATURITY_E8S;
+    over_spawn_limit || stakeless_leftover
 }
 
 async fn spawn_neurons(neuron_ids: Vec<u64>) {
@@ -310,7 +331,11 @@ async fn disburse_to_cycle_management_account(
 
 #[cfg(test)]
 mod tests {
+    use super::{should_spawn, MIN_SPAWNABLE_MATURITY_E8S, SPAWN_LIMIT_ICP};
     use ic_ledger_types::AccountIdentifier;
+    use nns_governance_canister::types::{Neuron, NeuronId};
+    use std::collections::HashMap;
+    use utils::consts::E8S_PER_ICP;
 
     use crate::state::{init_state, mutate_state, read_state, RuntimeState};
 
@@ -346,5 +371,82 @@ mod tests {
             cycle_management_account.clone().unwrap(),
             account1.as_bytes()
         );
+    }
+
+    fn neuron(stake_e8s: u64, maturity_e8s: u64, spawn_at: Option<u64>) -> Neuron {
+        Neuron {
+            id: Some(NeuronId {
+                id: 2_115_552_344_633_178_977,
+            }),
+            account: vec![],
+            controller: None,
+            hot_keys: vec![],
+            cached_neuron_stake_e8s: stake_e8s,
+            neuron_fees_e8s: 0,
+            created_timestamp_seconds: 0,
+            aging_since_timestamp_seconds: 0,
+            spawn_at_timestamp_seconds: spawn_at,
+            followees: HashMap::default(),
+            recent_ballots: vec![],
+            kyc_verified: false,
+            maturity_e8s_equivalent: maturity_e8s,
+            staked_maturity_e8s_equivalent: None,
+            auto_stake_maturity: None,
+            not_for_profit: false,
+            joined_community_fund_timestamp_seconds: None,
+            known_neuron_data: None,
+            dissolve_state: None,
+            voting_power_refreshed_timestamp_seconds: None,
+            potential_voting_power: None,
+            neuron_type: None,
+            deciding_voting_power: None,
+            visibility: None,
+        }
+    }
+
+    #[test]
+    fn spawns_leftover_maturity_of_neuron_without_stake() {
+        assert!(should_spawn(&neuron(0, 8_888_590_316, None)));
+        assert!(should_spawn(&neuron(0, MIN_SPAWNABLE_MATURITY_E8S, None)));
+    }
+
+    #[test]
+    fn does_not_spawn_maturity_below_nns_minimum() {
+        assert!(!should_spawn(&neuron(
+            0,
+            MIN_SPAWNABLE_MATURITY_E8S - 1,
+            None
+        )));
+        assert!(!should_spawn(&neuron(0, 0, None)));
+    }
+
+    #[test]
+    fn does_not_spawn_neuron_that_is_already_spawning() {
+        assert!(!should_spawn(&neuron(
+            0,
+            8_888_590_316,
+            Some(1_788_599_490)
+        )));
+        assert!(!should_spawn(&neuron(
+            0,
+            2000 * E8S_PER_ICP,
+            Some(1_788_599_490)
+        )));
+    }
+
+    #[test]
+    fn staked_neuron_only_spawns_above_spawn_limit() {
+        let stake = 55_588_837_310_215;
+        assert!(!should_spawn(&neuron(stake, 17_852_254_223, None)));
+        assert!(!should_spawn(&neuron(
+            stake,
+            SPAWN_LIMIT_ICP * E8S_PER_ICP,
+            None
+        )));
+        assert!(should_spawn(&neuron(
+            stake,
+            SPAWN_LIMIT_ICP * E8S_PER_ICP + 1,
+            None
+        )));
     }
 }

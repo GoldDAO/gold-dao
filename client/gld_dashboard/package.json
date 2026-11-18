@@ -4,14 +4,14 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode staging",
+    "dev": "vite",
     "dev:preprod": "vite --mode preprod",
     "build": "",
     "build:staging": "tsc && vite build --mode staging",
     "build:preprod": "tsc && vite build --mode preprod",
     "build:production": "tsc && vite build --mode production",
-    "deploy:staging": "pnpm run build:staging && dfx deploy gldt_swap_app --network=staging",
-    "deploy:preprod": "pnpm run build:preprod && dfx deploy gldt_swap_app --network=preprod",
+    "deploy:staging": "pnpm run build:staging && dfx deploy gld_dashboard --network=staging",
+    "deploy:preprod": "pnpm run build:preprod && dfx deploy gld_dashboard --network=preprod",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
