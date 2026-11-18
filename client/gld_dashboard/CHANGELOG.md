@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.5.1] - 2026-11-18
+
+#### Changed
+
+- The Docs link and the staking guide link in the "Add Neuron" dialog open the docs on `www.gold-dao.org/docs`. They pointed to `docs.gold-dao.org`, which is only a forward to the new docs now.
+
 ### [2.5.0] - 2026-11-18
 
 #### Added
