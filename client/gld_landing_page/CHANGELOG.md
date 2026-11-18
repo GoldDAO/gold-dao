@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.0.0] - 2026-11-18
+
+### Changed
+
+- New one-page website about GOLDAO and the treasury. The GLD NFT, GLDT and USDG content is gone.
+- The treasury holdings are shown live from the analytics API
+- Typeface and colors are the ones of the Gold DAO dApp
+- New social preview image
+- The Content-Security-Policy only allows the two hosts the page uses
+
+### Removed
+
+- Translations, canister bindings and the dependencies they needed (i18next, react-query, @dfinity)
+- The old images, the background video and the old whitepaper PDF. The build went from 30 MB to 1 MB.
+
 ### [1.0.11] - 2026-11-17
 
 ### Changed
