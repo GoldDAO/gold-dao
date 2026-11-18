@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.6.0] - 2026-11-18
+
+#### Added
+
+- Add any ICRC-1 token to the wallet by the canister ID of its ledger, with "Add token" at the end of the token list. The app reads symbol, name, decimals and logo from the ledger and shows them for review before the token is added.
+- An added token shows its balance, counts in the total value, and can be transferred and removed again. Its transaction history is shown when the ledger names an index canister or one is entered by hand.
+- The price of an added token comes from its ICPSwap pool against ICP. Without such a pool the token shows "No price" and counts as 0 in the total.
+- A token whose symbol is already in the wallet cannot be added. This keeps imitations of the built-in tokens out.
+- The added tokens are saved in the browser, so they do not follow the account to another device.
+
+#### Changed
+
+- Transfer amounts are converted exactly instead of through floating point, which is needed for tokens with 18 decimals.
+
+#### Fix
+
+- The review step of a transfer divided every amount by 10^8, so amounts of tokens with other decimals were shown wrong (ckUSDT 100 times too small). Only the display was affected, not the amount that was sent.
+- The Transfer button stayed active when a valid recipient was changed into an invalid one, and the "Invalid Principal" message stayed after the recipient became valid.
+- A subaccount that is not hexadecimal, for example with a `0x` prefix or a leading space, was accepted and then ignored, so the transfer would have gone to the default account of the principal. It is refused now.
+- Switching to "Use Principal & Subaccount" also submitted the transfer form.
+- The back arrow in the review step of the transfer, mint and burn dialogs was not visible.
+
 ### [2.5.1] - 2026-11-18
 
 #### Changed
