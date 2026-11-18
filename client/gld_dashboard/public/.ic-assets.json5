@@ -9,8 +9,13 @@
     security_policy: "standard",
     headers: {
       "Referrer-Policy": "strict-origin-when-cross-origin",
+      // connect-src lists every host the app sends requests to: the Internet
+      // Computer and api.gldt.org, which the gold price comes from
+      // (src/services/gldt_api). A request to a host that is not listed is
+      // blocked by the browser, on the deployed app only; `pnpm dev` does not
+      // send this header.
       "Content-Security-Policy":
-        "default-src 'self';script-src 'self' 'unsafe-eval' 'unsafe-inline';connect-src 'self' http://localhost:* https://icp0.io https://ic0.app https://*.icp0.io https://icp-api.io https://price-history.api.bity51.com https://price-history.api.bity.com;img-src 'self' https://*.raw.icp0.io data:;style-src * 'unsafe-inline';style-src-elem * 'unsafe-inline';font-src *;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;",
+        "default-src 'self';script-src 'self' 'unsafe-eval' 'unsafe-inline';connect-src 'self' http://localhost:* https://icp0.io https://ic0.app https://*.icp0.io https://icp-api.io https://api.gldt.org;img-src 'self' https://*.raw.icp0.io data:;style-src * 'unsafe-inline';style-src-elem * 'unsafe-inline';font-src *;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;",
       // Security: The permissions policy disables all features for security reasons. If your site needs such permissions, activate them.
       // To configure permissions go here https://www.permissionspolicy.com/
       "Permissions-Policy":
