@@ -9,7 +9,6 @@ spec:
           "management",
           "sns_neuron_controller",
           "sns_rewards",
-          "super_stats_v3",
           "gldt_stake",
         ]
 ---

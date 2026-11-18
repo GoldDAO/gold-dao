@@ -162,36 +162,6 @@
       "type": "custom",
       "wasm": "backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz"
     },
-    "super_stats_v3": {
-      "type": "custom",
-      "candid": "backend/canisters/super_stats_v3/api/can.did",
-      "optimize": "cycles",
-      "package": "super_stats_v3",
-      "wasm": "backend/canisters/super_stats_v3/target/wasm32-unknown-unknown/release/super_stats_v3_canister.wasm.gz",
-      "declarations": {
-        "bindings": ["js", "did", "ts"],
-        "env_override": null,
-        "output": "backend/canisters/super_stats_v3/api/declarations"
-      }
-    },
-    "super_stats_v3_gldt": {
-      "type": "custom",
-      "candid": "backend/canisters/super_stats_v3/api/can.did",
-      "optimize": "cycles",
-      "package": "super_stats_v3",
-      "wasm": "backend/canisters/super_stats_v3/target/wasm32-unknown-unknown/release/super_stats_v3_canister.wasm.gz"
-    },
-    "token_metrics": {
-      "build": ["./scripts/build_canister.sh token_metrics"],
-      "candid": "backend/canisters/token_metrics/api/can.did",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/token_metrics/api/declarations"
-      },
-      "type": "custom",
-      "wasm": "backend/canisters/token_metrics/target/wasm32-unknown-unknown/release/token_metrics_canister.wasm.gz"
-    },
     "sns_governance": {
       "build": "",
       "candid": "backend/external_canisters/sns_governance/api/can.did",
