@@ -1,6 +1,11 @@
+import Link from 'next/link'
 import Logo from '@/components/Logo'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import Treasury from '@/components/Treasury'
+import { docsPath } from '@/docs/nav'
 import { links } from '@/links'
+import { container } from '@/site'
 
 const newTab = { target: '_blank', rel: 'noopener noreferrer' }
 
@@ -8,7 +13,7 @@ const steps = [
   {
     title: 'Stake',
     text: 'Lock GOLDAO in a neuron in the NNS dapp. The staking guide covers getting GOLDAO and creating the neuron.',
-    link: { label: 'Read the staking guide', href: links.stakingGuide }
+    link: { label: 'Read the staking guide', href: docsPath('stake-goldao') }
   },
   {
     title: 'Vote',
@@ -22,38 +27,18 @@ const steps = [
   }
 ]
 
-const footerLinks = [
-  { label: 'App', href: links.app },
-  { label: 'Docs', href: links.docs },
-  { label: 'Proposals', href: links.proposals, ...newTab },
-  { label: 'ICP dashboard', href: links.icpDashboard, ...newTab },
-  { label: 'X', href: links.x, ...newTab }
-]
-
-const container = 'mx-auto max-w-6xl px-5 sm:px-8'
+// The asset canister answers every path it does not know with this page. Under
+// /docs that is an old GitBook link (docs.gold-dao.org forwards here and keeps
+// the path) or a typo, and the visitor belongs on the docs, not on the home
+// page. The script runs while the HTML is parsed, before anything is shown.
+// The real docs pages are files of their own and never contain it.
+const docsFallback = `if(location.pathname.indexOf('/docs/')===0)location.replace('${docsPath('')}')`
 
 export default function Page () {
   return (
     <>
-      <header className='bg-black text-white'>
-        <div className={`${container} flex items-center justify-between py-5`}>
-          <a href='/' className='flex items-center gap-3'>
-            <Logo id='header-mark' className='h-9 w-auto' />
-            <span className='text-xl font-medium'>Gold DAO</span>
-          </a>
-          <nav aria-label='Main' className='flex items-center gap-6'>
-            <a
-              href={links.docs}
-              className='hidden hover:underline hover:underline-offset-4 sm:block'
-            >
-              Docs
-            </a>
-            <a href={links.app} className='button button-outline h-11 px-5'>
-              Launch app
-            </a>
-          </nav>
-        </div>
-      </header>
+      <script dangerouslySetInnerHTML={{ __html: docsFallback }} />
+      <SiteHeader />
 
       <main>
         <section className='overflow-hidden bg-black text-white'>
@@ -99,7 +84,7 @@ export default function Page () {
             How it works
           </h2>
           <ol className='mt-10 grid gap-10 md:mt-14 md:grid-cols-3 md:gap-12'>
-            {steps.map(({ title, text, link: { label, ...link } }, index) => (
+            {steps.map(({ title, text, link: { label, href, ...link } }, index) => (
               <li
                 key={title}
                 className='flex flex-col border-t border-content pt-6'
@@ -113,43 +98,30 @@ export default function Page () {
                 <p className='mt-3 leading-relaxed text-content/70 md:text-lg md:leading-relaxed'>
                   {text}
                 </p>
-                <a {...link} className='text-link mt-5 self-start font-medium'>
-                  {label}
-                </a>
+                {/* The staking guide is a page of this site and goes through the Next.js router */}
+                {href.startsWith('/') ? (
+                  <Link
+                    href={href}
+                    className='text-link mt-5 self-start font-medium'
+                  >
+                    {label}
+                  </Link>
+                ) : (
+                  <a
+                    href={href}
+                    {...link}
+                    className='text-link mt-5 self-start font-medium'
+                  >
+                    {label}
+                  </a>
+                )}
               </li>
             ))}
           </ol>
         </section>
       </main>
 
-      <footer className='bg-black text-white'>
-        <div className={`${container} py-12`}>
-          <div className='flex flex-col gap-8 md:flex-row md:items-center md:justify-between'>
-            <div className='flex items-center gap-3'>
-              <Logo id='footer-mark' className='h-8 w-auto' />
-              <span className='text-lg font-medium'>Gold DAO</span>
-            </div>
-            <nav aria-label='Footer'>
-              <ul className='flex flex-wrap gap-x-7 gap-y-3'>
-                {footerLinks.map(({ label, ...link }) => (
-                  <li key={label}>
-                    <a
-                      {...link}
-                      className='hover:underline hover:underline-offset-4'
-                    >
-                      {label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-          <p className='mt-10 border-t border-white/20 pt-6 text-sm text-white/60'>
-            © {new Date().getFullYear()} Gold DAO. GOLDAO is a governance
-            token. Rewards vary and are not guaranteed.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   )
 }
