@@ -1,27 +1,50 @@
-/* eslint-disable react/jsx-no-undef */
-'use client'
-import { Inter } from 'next/font/google'
-import { I18nextProvider } from 'react-i18next'
-import i18n from '../../i18n'
+import type { Metadata } from 'next'
 import './globals.css'
-import ReactQueryProvider from '@/providers/ReactQueryProvider'
 
-const inter = Inter({ subsets: ['latin'] })
+const title = 'Gold DAO'
+const description =
+  'Gold DAO holds a treasury of staked ICP, OGY and WTN on the Internet Computer. GOLDAO stakers vote on what happens with it and receive a share of what it earns.'
+// public/og.png, 1200 x 630
+const image = {
+  url: '/og.png',
+  width: 1200,
+  height: 630,
+  alt: 'Gold DAO. Stake GOLDAO. Govern the treasury.'
+}
+
+export const metadata: Metadata = {
+  metadataBase: new URL('https://www.gold-dao.org'),
+  title,
+  description,
+  alternates: { canonical: '/' },
+  icons: { icon: '/favicon.ico' },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: title,
+    title,
+    description,
+    images: [image]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title,
+    description,
+    images: [image]
+  }
+}
 
 export default function RootLayout ({
-  children,
-  params
-}: Readonly<{
-  children: React.ReactNode
-  params: { locale: string }
-}>) {
+  children
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <I18nextProvider i18n={i18n}>
-      <html lang={'en'}>
-        <body className={` ${inter.className} bg-[#FAF9F8]`}>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
-        </body>
-      </html>
-    </I18nextProvider>
+    <html lang='en'>
+      <head>
+        {/* Polymath, the typeface of the Gold DAO dApp, from the same Adobe Fonts kit */}
+        <link rel='preconnect' href='https://use.typekit.net' crossOrigin='' />
+        <link rel='stylesheet' href='https://use.typekit.net/chv2tas.css' />
+      </head>
+      <body>{children}</body>
+    </html>
   )
 }
