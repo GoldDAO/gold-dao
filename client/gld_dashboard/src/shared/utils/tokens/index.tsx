@@ -171,6 +171,20 @@ export const TOKENS: Token[] = [
   TOKEN_CKUSDT,
 ];
 
+// Rows of the wallet list, in display order. "GLDNFT" is the GLD NFT row.
+export const WALLET_LIST: (Token | "GLDNFT")[] = [
+  TOKEN_GOLDAO,
+  ...(APP_MODE === "staging" ? [TOKEN_GOLDAO_IC] : []),
+  TOKEN_ICP,
+  ...(APP_MODE === "staging" ? [TOKEN_ICP_IC] : []),
+  TOKEN_OGY,
+  ...(APP_MODE === "staging" ? [TOKEN_OGY_IC] : []),
+  TOKEN_GLDT,
+  "GLDNFT",
+  TOKEN_CKUSDT,
+  TOKEN_WTN,
+];
+
 export const getTokenByDisplayName = (name: TokenName): Token | undefined => {
   return TOKENS.find((token) => token.display_name === name);
 };
