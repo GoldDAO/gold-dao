@@ -22,7 +22,13 @@ use utils::{consts::E8S_PER_ICP, env::Environment};
 // Refresh daily to distribute potential rewards but add 1 minute offset to leave enough time in case a neuron is spawned
 const REFRESH_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS + MINUTE_IN_MS;
 
-const SPAWN_LIMIT_ICP: u64 = 1000;
+// Maturity above this limit is spawned by the daily job, which pays the rewards out one week
+// later. For one payout per week the limit must satisfy 6 * daily_reward <= limit < 7 * daily_reward,
+// because maturity grows by one NNS reward round per day. Measured in October 2026: neuron
+// 7446549063176501841 earns about 125 ICP per round when it votes on every proposal, so 780 ICP
+// keeps the weekly rhythm for daily rewards between roughly 112 and 130 ICP. Re-tune when the
+// reward rate drifts (NNS reward pool decay, age bonus, missed votes on Governance proposals).
+const SPAWN_LIMIT_ICP: u64 = 780;
 
 // The NNS rejects a spawn when the maturity, after the worst case maturity modulation of -5%,
 // would mint less than the minimum neuron stake of 1 ICP. 1.1 ICP keeps a small margin above that.

@@ -12,6 +12,7 @@ generate_pocket_query_call!(get_total_staked);
 generate_pocket_query_call!(get_apy_timeseries);
 generate_pocket_query_call!(get_daily_analytics);
 generate_pocket_query_call!(get_proposal_votes_of_neuron);
+generate_pocket_query_call!(http_request);
 generate_pocket_query_call!(icrc3_get_properties);
 generate_pocket_query_call!(icrc3_get_blocks);
 generate_pocket_query_call!(icrc3_get_tip_certificate);

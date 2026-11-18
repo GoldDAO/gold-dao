@@ -1,5 +1,8 @@
 default:
   image: dckreg.bity.com/bity/dev/runners_images/dfinity-canisters:0.31.0
+  # A newer pipeline on the same ref may cancel running jobs. Every job of the
+  # deploy stage sets "interruptible: false", so a deploy is never cut off half
+  # way (a canister upgrade is stop, install, start).
   interruptible: true
   before_script:
     - dfx --version
@@ -11,11 +14,6 @@ default:
       - api_failure
       - runner_unsupported
       - unknown_failure
-
-cache:
-  - key: "dfx-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .dfx
 
 stages:
   - preparation
@@ -36,42 +34,12 @@ include:
       src-folder: gld_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
-      src-folder: gldt_swap_app
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
-      src-folder: usdg
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
       src-folder: gld_dashboard
   # - local: scripts/ci-cd/.frontend_linter.yml
   #   inputs:
   #     src-folder: internal_dashboard
-  # Unit tests
-  - local: scripts/ci-cd/.libraries_unit_test_coverage.yml
+  # Unit tests: one job for the whole workspace
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: buyback_burn
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: icp_neuron
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: sns_rewards
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: management
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: sns_neuron_controller
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: gldt_swap_index
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: gldt_stake
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
@@ -92,36 +60,20 @@ include:
       src-folder: sns_rewards
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
-      src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: gldt_swap_index
-  # - local: scripts/ci-cd/.canister_builds.yml
-  #   inputs:
-  #     src-folder: usdg_minter
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
       src-folder: gldt_stake
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_landing_page
-  - local: scripts/ci-cd/.frontend_builds.yml
-    inputs:
-      src-folder: gldt_swap_app
+      deploy-to-preprod: "false"
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_dashboard
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: internal_dashboard
+      deploy-to-preprod: "false"
   # Backend deployments
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: gldt_swap_index
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: buyback_burn
@@ -147,12 +99,9 @@ include:
       sns-controlled: "true"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
-      src-folder: gldt_swap_app
-      sns-controlled: "false"
-  - local: scripts/ci-cd/.frontend_deploys.yml
-    inputs:
       src-folder: gld_landing_page
       sns-controlled: "false"
+      deploy-to-preprod: "false"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: internal_dashboard
@@ -160,21 +109,63 @@ include:
       deploy-to-preprod: "false"
 
 ################################################################################
-# Cache preparation
+# Every merge request
 ################################################################################
-node cache:
+# "Pipelines must succeed" is on for this project, and GitLab does not merge a
+# merge request that has no pipeline at all. Every other job has a "changes"
+# list, so a merge request that matched none of them (one that only touches
+# .gitlab-ci.yml, a deploy script or the README) had no pipeline and could only
+# be merged from the command line.
+#
+# This job is in every merge request pipeline. It checks what would otherwise
+# only show at deploy time: that the shell scripts parse and that the JSON
+# files they read are valid. On the merge request from develop to master it is
+# the only job, see the note on "rust lint".
+scripts check:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/**/*.{js,ts,json,jsx,tsx,md,mdx,css,html,svg}"
-        - "client/**/pnpm-lock.yaml"
-        - "pnpm-workspace.yaml"
-  extends: .node template
+  before_script: []
   script:
-    - pnpm pkg get name description author license workspaces engines
-    - node --version
-    - pnpm --version
+    - |
+      for script in $(find scripts -name "*.sh" | sort); do
+        bash -n "$script" || exit 1
+      done
+      echo "$(find scripts -name "*.sh" | wc -l) shell scripts parse"
+    - jq empty canister_ids.json dfx.json scripts/frontend-deploy/frontend_config.json
+
+################################################################################
+# Release tags
+################################################################################
+# Fails a release pipeline whose tag is not on master before anything is built
+# or deployed: every other job of a tag pipeline waits for this stage, directly
+# or through its "needs". This catches a tag put on the wrong commit. It does
+# not stop someone who may create release tags and edits this file; the
+# protected tag rules in the GitLab settings are there for that.
+release tag is on master:
+  stage: preparation
+  image: node:24.22.1 # any image that has git, the alpine one of the node jobs has none
+  before_script:
+    - git --version
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+(-reinstall)?$/'
+    # A change to this file is tried on its merge request. Without a tag the
+    # job only reports and never fails.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - ".gitlab-ci.yml"
+  script:
+    - git fetch --quiet origin "+refs/heads/master:refs/remotes/origin/master"
+    - |
+      if git merge-base --is-ancestor "$CI_COMMIT_SHA" origin/master; then
+        echo "$CI_COMMIT_SHORT_SHA is on master."
+      elif [ -z "$CI_COMMIT_TAG" ]; then
+        echo "$CI_COMMIT_SHORT_SHA is not on master. There is no tag, this is the trial run on a merge request."
+      else
+        echo "$CI_COMMIT_TAG points to $CI_COMMIT_SHORT_SHA, which is not on master."
+        echo "Release tags belong on a commit of master: delete the tag and create it there."
+        exit 1
+      fi
 
 ################################################################################
 # Linters
@@ -182,16 +173,17 @@ node cache:
 
 # See includes above for frontends lint
 
+# Lint and unit tests do not run on the merge request from develop (the release
+# merge request to master): its commit has just been linted and tested by the
+# branch pipeline of develop.
 rust lint:
   stage: lint
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
         - "Cargo.{lock,toml}"
         - "backend/**/*.{rs,toml,lock,md,did,wasm,gz}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
         - "backend/**/*.{rs,toml,lock,md,did,wasm,gz}"

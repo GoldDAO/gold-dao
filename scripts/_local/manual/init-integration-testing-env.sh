@@ -1,4 +1,6 @@
-POCKET_IC_SERVER_VERSION="9.0.1"
+# Has to be a version the pocket-ic crate in Cargo.lock accepts (12.0.0 up to, not including, 13).
+# The tests only use this binary when POCKET_IC_BIN points to it, otherwise the crate downloads its own.
+POCKET_IC_SERVER_VERSION="12.0.0"
 
 if [[ $OSTYPE == "linux-gnu"* ]]
 then

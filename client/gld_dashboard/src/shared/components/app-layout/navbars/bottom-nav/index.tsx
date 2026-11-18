@@ -12,7 +12,7 @@ const BottomNav = ({ className }: { className?: string }) => {
         </div>
         <div className="flex flex-col xl:flex-row items-center gap-2 xl:gap-6 text-content/60 text-sm">
           <a
-            href="https://origyn.gitbook.io"
+            href="https://docs.gold-dao.org"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center hover:underline"

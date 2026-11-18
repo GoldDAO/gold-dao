@@ -5,10 +5,7 @@ spec:
       options:
         [
           "buyback_burn",
-          "gldt_swap",
-          "gldt_swap_index",
           "icp_neuron",
-          # "usdg",
           "management",
           "sns_neuron_controller",
           "sns_rewards",
@@ -16,13 +13,27 @@ spec:
         ]
 ---
 # Rust canisters deployments
+#
+# The tag rules have no "changes" list: GitLab evaluates "changes" to true on
+# every tag pipeline, so it never filtered anything there.
+#
+# Every deploy job, frontend or backend, has an environment of its own named
+# "<tier>/<canister>" (staging/, preprod/, production/). The production key and
+# proposer neuron (PEM_FILE_PRODUCTION, SNS_PROPOSER_NEURON_ID_PRODUCTION) can
+# then be limited to the environment scope "production/*" in the GitLab
+# settings, so only the production deploy jobs receive them. Build jobs must
+# keep environment names outside "production/".
 
 $[[ inputs.src-folder ]] staging deploy:
   stage: deploy
+  interruptible: false
   resource_group: staging
   rules:
+    # Same list as the develop rule of the staging build.
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event" # deployment when merged to develop
       changes:
+        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop" # deployment when trigger manually on MR
       changes:
@@ -40,19 +51,16 @@ $[[ inputs.src-folder ]] staging deploy:
   script:
     - . scripts/canister-deploy/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
   environment:
-    name: $[[ inputs.src-folder ]]
+    name: staging/$[[ inputs.src-folder ]]
     deployment_tier: staging
     action: start
 
 $[[ inputs.src-folder ]] production deploy:
   stage: deploy
+  interruptible: false
   resource_group: production
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
       when: manual
   variables:
     TARGET_NETWORK: ic
@@ -63,32 +71,34 @@ $[[ inputs.src-folder ]] production deploy:
   script:
     - . scripts/canister-deploy/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
   environment:
-    name: $[[ inputs.src-folder ]]
+    name: production/$[[ inputs.src-folder ]]
     deployment_tier: production
     action: start
 
 $[[ inputs.src-folder ]] github release:
   stage: deploy
+  interruptible: false
   resource_group: github_release
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
       when: manual
     # - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop" # FOR TESTING ONLY, REMOVE AFTERWARDS!!!!
     #   changes:
     #     - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
     #   when: manual
   needs: ["$[[ inputs.src-folder ]] production build"]
-  variables:
-    GITHUB_TOKEN: ${GITHUB_TOKEN}
-    GITHUB_REPO: ${GITHUB_REPO}
+  # GITHUB_TOKEN and GITHUB_REPO (<owner>/<repo>) come from the CI/CD variables
+  # of the project. They only need to reach this job: protected, masked, and
+  # with the environment scope "github_release".
   before_script:
     - apt-get update && apt-get install -y curl jq
   script:
     - |
+      if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_REPO" ]; then
+        echo "GITHUB_TOKEN or GITHUB_REPO is not set, see the comment on this job in scripts/ci-cd/.canister_deploys.yml"
+        exit 1
+      fi
+
       SRC_FOLDER="$[[ inputs.src-folder ]]"
       WASM_PATH="backend/canisters/${SRC_FOLDER}/target/wasm32-unknown-unknown/release/${SRC_FOLDER}_canister.wasm.gz"
       DID_PATH="backend/canisters/${SRC_FOLDER}/api/can.did"
@@ -107,7 +117,9 @@ $[[ inputs.src-folder ]] github release:
 
       RELEASE_NAME="Release $CI_COMMIT_TAG"
 
-      RELEASE_RESPONSE=$(curl -s -X POST \
+      # --fail-with-body: an error answer of GitHub fails the job and is shown.
+      # Without it curl exits with 0 and the job went on with an empty upload URL.
+      RELEASE_RESPONSE=$(curl -sS --fail-with-body -X POST \
         -H "Authorization: token $GITHUB_TOKEN" \
         -H "Accept: application/vnd.github.v3+json" \
         "https://api.github.com/repos/$GITHUB_REPO/releases" \
@@ -117,12 +129,17 @@ $[[ inputs.src-folder ]] github release:
           \"body\": \"Release automatic from GitLab CI\",
           \"draft\": false,
           \"prerelease\": false
-        }")
+        }") || { echo "GitHub did not create the release:"; echo "$RELEASE_RESPONSE"; exit 1; }
 
-      UPLOAD_URL=$(echo $RELEASE_RESPONSE | jq -r '.upload_url' | sed 's/{?name,label}//')
+      UPLOAD_URL=$(echo "$RELEASE_RESPONSE" | jq -r '.upload_url // empty' | sed 's/{?name,label}//')
+      if [ -z "$UPLOAD_URL" ]; then
+        echo "The answer of GitHub has no upload_url:"
+        echo "$RELEASE_RESPONSE"
+        exit 1
+      fi
 
       echo "Uploading $WASM_PATH..."
-      curl -s -X POST \
+      curl -sS --fail-with-body -X POST \
         -H "Authorization: token $GITHUB_TOKEN" \
         -H "Content-Type: application/octet-stream" \
         --data-binary @"$WASM_PATH" \
@@ -130,7 +147,7 @@ $[[ inputs.src-folder ]] github release:
 
       if [ "$HAS_DID" = true ]; then
         echo "Uploading $DID_PATH..."
-        curl -s -X POST \
+        curl -sS --fail-with-body -X POST \
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Content-Type: application/octet-stream" \
           --data-binary @"$DID_PATH" \

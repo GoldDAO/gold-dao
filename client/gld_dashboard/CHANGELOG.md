@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.5.0] - 2026-11-18
+
+#### Added
+
+- Show the total USD value of the wallet: the token balances plus the gold value of the GLD NFTs
+
+#### Changed
+
+- Move Earn out of the navigation; it is now a button in the GLDT tab of the wallet
+- List the wallet tokens as GOLDAO, ICP, OGY, GLDT, GLD NFT, ckUSDT, WTN and select GOLDAO by default
+- Drop `app.gldt.org` from the custom domains and the Internet Identity alternative origins; the domain now forwards to app.gold-dao.org at the DNS level
+
+#### Fix
+
+- Read the gold price from api.gldt.org; the previous source stopped answering, so the USD value of the GLD NFTs was not shown
+
+### [2.4.0] - 2026-11-17
+
+#### Changed
+
+- Rebrand the app from GLDT to Gold DAO: title "Gold DAO dApp", Gold DAO logo and wordmark, favicon, description and Open Graph tags
+- Add `app.gold-dao.org` as custom domain and Internet Identity alternative origin; `app.gldt.org` stays listed during the transition
+- Point the Docs link to docs.gold-dao.org and the "Buy GLDT" button in the burn flow to gldt.org
+- `pnpm dev` now runs against the mainnet canisters (`.env.development`)
+
+#### Fix
+
+- `deploy:staging` and `deploy:preprod` deployed `gldt_swap_app` instead of `gld_dashboard`
+
+### [2.3.3] - 2026-10-27
+
+#### Fix
+
+- Remove the failing call to the stopped GOLDAO super_stats canister on the home page
+
 ### [2.3.2] - 2026-05-13
 
 #### Fix

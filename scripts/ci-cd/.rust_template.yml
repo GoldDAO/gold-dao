@@ -1,7 +1,11 @@
 # Rust / Cargo (for wasm builds) template
 
 .rust template:
-  image: dckreg.bity.com/bity/dev/runners_images/rust-dfinity-build-ci:latest
+  # Pinned by digest. The registry only has the tag "latest" for this image
+  # (pushed 2026-04-01), and the wasm that goes into an SNS proposal must not
+  # change because that tag was moved. To update the image: push it, then put
+  # the new digest here. A version tag in the registry would be better still.
+  image: dckreg.bity.com/bity/dev/runners_images/rust-dfinity-build-ci@sha256:f5d67a688c556f578ec8b85de44b6ef966ede747bc40b5845dbbdd551fc24f4c
   before_script:
     - cargo --version
     - rustc --version

@@ -402,20 +402,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bity-ic-icrc3-c2c-client"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41a45f55237824b29fc4fb5b52e5b1a4f4d32fc6a02dc3ee2d1d0f73fc31e981"
-dependencies = [
- "bity-ic-canister-client",
- "bity-ic-icrc3 0.4.9",
- "bity-ic-types",
- "candid",
- "ic-cdk",
- "serde",
-]
-
-[[package]]
 name = "bity-ic-icrc3-macros"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -501,7 +487,7 @@ dependencies = [
  "hex",
  "ic-cdk",
  "ic-cdk-timers",
- "ic-management-canister-types",
+ "ic-management-canister-types 0.3.3",
  "icrc-ledger-types",
  "serde",
  "tokio",
@@ -648,9 +634,9 @@ checksum = "ade8366b8bd5ba243f0a58f036cc0ca8a2f069cff1a2351ef1cac6b083e16fc0"
 
 [[package]]
 name = "candid"
-version = "0.10.17"
+version = "0.10.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eaac522d18020d5fbc8320ecb12a9b13b2137ae31133da2d42fa256a825507c4"
+checksum = "8037a01ec09d6c06883a38bad4f47b8d06158ad360b841e0ae5707c9884dfaf6"
 dependencies = [
  "anyhow",
  "binread",
@@ -671,9 +657,9 @@ dependencies = [
 
 [[package]]
 name = "candid_derive"
-version = "0.10.17"
+version = "0.10.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a1b4fddbd462182050989068d53604a91a3d0f117c3c8316c6818023df00add"
+checksum = "fb45f4d5eff3805598ee633dd80f8afb306c023249d34b5b7dfdc2080ea1df2e"
 dependencies = [
  "lazy_static",
  "proc-macro2",
@@ -1324,156 +1310,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gldt_swap"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "bity-ic-canister-logger",
- "bity-ic-canister-state-macros",
- "bity-ic-canister-time",
- "bity-ic-canister-tracing-macros",
- "bity-ic-icrc3 0.5.0",
- "bity-ic-icrc3-macros",
- "bity-ic-serializer",
- "bity-ic-stable-memory",
- "bity-ic-types",
- "candid",
- "futures",
- "gldt_swap_api_archive",
- "gldt_swap_api_canister",
- "gldt_swap_archive_c2c_client",
- "gldt_swap_common",
- "http_request",
- "ic-cdk",
- "ic-cdk-macros",
- "ic-stable-structures",
- "icrc-ledger-types",
- "icrc_ledger_canister",
- "icrc_ledger_canister_c2c_client",
- "lazy_static",
- "origyn_nft_canister",
- "origyn_nft_canister_c2c_client",
- "serde",
- "serde_json",
- "strum 0.27.2",
- "strum_macros 0.27.2",
- "tracing",
- "types",
- "utils",
-]
-
-[[package]]
-name = "gldt_swap_api_archive"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-time",
- "bity-ic-types",
- "candid",
- "ic-ledger-types",
- "icrc-ledger-types",
- "serde",
- "thiserror 2.0.16",
- "types",
-]
-
-[[package]]
-name = "gldt_swap_api_canister"
-version = "0.1.0"
-dependencies = [
- "bity-ic-icrc3 0.5.0",
- "bity-ic-types",
- "candid",
- "gldt_swap_api_archive",
- "gldt_swap_common",
- "icrc-ledger-types",
- "serde",
- "types",
- "utils",
-]
-
-[[package]]
-name = "gldt_swap_archive_c2c_client"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-client",
- "gldt_swap_api_archive",
-]
-
-[[package]]
-name = "gldt_swap_common"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-time",
- "candid",
- "cbor",
- "icrc-ledger-types",
- "minicbor 1.1.0",
- "origyn_nft_canister_c2c_client",
- "serde",
- "types",
-]
-
-[[package]]
-name = "gldt_swap_index"
-version = "0.1.0"
-dependencies = [
- "bity-ic-canister-logger",
- "bity-ic-canister-state-macros",
- "bity-ic-canister-time",
- "bity-ic-canister-tracing-macros",
- "bity-ic-icrc3-archive-c2c-client",
- "bity-ic-icrc3-c2c-client",
- "bity-ic-serializer",
- "bity-ic-stable-memory",
- "bity-ic-types",
- "bity-ic-utils",
- "candid",
- "futures",
- "gldt_swap_common",
- "gldt_swap_index_api_canister",
- "hex",
- "http_request",
- "ic-cdk",
- "ic-cdk-macros",
- "ic-cdk-timers",
- "ic-ledger-types",
- "ic-stable-structures",
- "ic0 1.0.0",
- "icrc-ledger-types",
- "lazy_static",
- "minicbor 1.1.0",
- "num-bigint",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "serde_json",
- "sha2 0.10.9",
- "time",
- "tracing",
- "tracing-attributes",
- "tracing-subscriber",
- "types",
-]
-
-[[package]]
-name = "gldt_swap_index_api_canister"
-version = "0.1.0"
-dependencies = [
- "bity-ic-icrc3 0.5.0",
- "bity-ic-types",
- "candid",
- "cbor",
- "gldt_swap_common",
- "ic-stable-structures",
- "icrc-ledger-types",
- "minicbor 1.1.0",
- "serde",
- "serde_bytes",
- "types",
- "utils",
-]
-
-[[package]]
 name = "group"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1765,7 +1601,7 @@ dependencies = [
  "ic-cdk-executor",
  "ic-cdk-macros",
  "ic-error-types",
- "ic-management-canister-types",
+ "ic-management-canister-types 0.3.3",
  "ic0 1.0.0",
  "serde",
  "serde_bytes",
@@ -1909,6 +1745,17 @@ name = "ic-management-canister-types"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea7e5b8a0f7c3b320d9450ac950547db4f24a31601b5d398f9680b64427455d2"
+dependencies = [
+ "candid",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "ic-management-canister-types"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3149217e24186df3f13dc45eee14cdb3e5cad07d0b2b67bd53555c1c55462957"
 dependencies = [
  "candid",
  "serde",
@@ -2424,10 +2271,6 @@ dependencies = [
  "candid",
  "gldt_stake_api_canister",
  "gldt_stake_common",
- "gldt_swap_api_archive",
- "gldt_swap_api_canister",
- "gldt_swap_common",
- "gldt_swap_index_api_canister",
  "hex",
  "http",
  "http-body-util",
@@ -2474,16 +2317,6 @@ name = "ipnet"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "469fb0b9cefa57e3ef31275ee7cacb78f2fdca44e4765491884a2b119d4eb130"
-
-[[package]]
-name = "iri-string"
-version = "0.7.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbc5ebe9c3a1a7a5127f920a418f7585e9e758e911d0466ed004f393b0e380b2"
-dependencies = [
- "memchr",
- "serde",
-]
 
 [[package]]
 name = "itertools"
@@ -2975,9 +2808,9 @@ dependencies = [
 
 [[package]]
 name = "pocket-ic"
-version = "9.0.2"
+version = "12.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e523c23bda9dc26ae989aab647b8bd805b54c72a3f2f00d668830d8b490c9c8"
+checksum = "03c0fe19b920be1485cdd3d58a70abfa768c2608f8349864d950791fe1a5c193"
 dependencies = [
  "backoff",
  "base64 0.13.1",
@@ -2985,10 +2818,11 @@ dependencies = [
  "flate2",
  "hex",
  "ic-certification",
- "ic-management-canister-types",
+ "ic-management-canister-types 0.5.0",
  "ic-transport-types 0.40.1",
  "reqwest",
  "schemars 0.8.22",
+ "semver",
  "serde",
  "serde_bytes",
  "serde_cbor",
@@ -3146,7 +2980,7 @@ dependencies = [
  "once_cell",
  "socket2 0.5.10",
  "tracing",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3313,9 +3147,9 @@ checksum = "caf4aa5b0f434c91fe5c7f1ecb6a5ece2130b02ad2a590589dda5146df959001"
 
 [[package]]
 name = "reqwest"
-version = "0.12.23"
+version = "0.12.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d429f34c8092b2d42c7c93cec323bb4adeb7c67698f70839adec842ec10c7ceb"
+checksum = "eddd3ca559203180a307f12d114c268abf583f59b03cb906fd0b3ff8646c1147"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -3603,6 +3437,9 @@ name = "semver"
 version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e6fa9c48d24d85fb3de5ad847117517440f6beceb7798af16b4a87d616b8d0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "serde"
@@ -4046,7 +3883,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4353,20 +4190,20 @@ dependencies = [
 
 [[package]]
 name = "tower-http"
-version = "0.6.6"
+version = "0.6.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adc82fd73de2a9722ac5da747f12383d2bfdb93591ee6c58486e0097890f05f2"
+checksum = "4cfcf7e2740e6fc6d4d688b4ef00650406bb94adf4731e43c096c3a19fe40840"
 dependencies = [
  "bitflags",
  "bytes",
  "futures-util",
  "http",
  "http-body",
- "iri-string",
  "pin-project-lite",
  "tower",
  "tower-layer",
  "tower-service",
+ "url",
 ]
 
 [[package]]

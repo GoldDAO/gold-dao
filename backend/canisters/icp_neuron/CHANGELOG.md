@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.7] - 2026-10-05
+
+#### Changed
+
+- **Weekly reward payouts**: the limit at which the daily job spawns the maturity of the Gold DAO NNS neuron is lowered from 1000 ICP to 780 ICP. The job spawns the maturity once it exceeds the limit, the NNS mints the spawned neuron seven days later, and the job disburses it to the reward recipients the same day. Since the seven NNS neurons were merged into neuron 7446549063176501841, that neuron earns about 125 ICP per daily NNS reward round when it votes on every proposal, about 880 ICP per week. With the 1000 ICP limit a payout therefore happened only every eight to nine days and the payout day kept shifting. With 780 ICP the maturity stays below the limit after six reward rounds (about 750 ICP) and exceeds it after seven (about 880 ICP), so a spawn, and one week later a payout, happens every seven days. The margin keeps the weekly rhythm as long as the daily reward stays between roughly 112 and 130 ICP, for example when a vote on a Governance proposal is missed (such proposals count 20 times as much as other proposals in the reward calculation). Payouts become smaller and regular; the total amount distributed does not change.
+
+#### Removed
+
+- The one-off reset of the cycle management account list that version 1.1.6 applied during its upgrade. It has done its job and would otherwise overwrite the list on every future upgrade.
+
 ### [1.1.6] - 2026-09-08
 
 - Spawn the maturity of ICP neurons without stake (leftover voting rewards of the six neurons that were merged into neuron 7446549063176501841). The spawned neurons are disbursed by the regular daily job.

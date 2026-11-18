@@ -4,9 +4,7 @@ import Icon from "@shared/ui/icons";
 import VerticalButton from "@shared/ui/button/VerticalButton";
 
 type Feature =
-  | "buy"
   | "transfer"
-  | "swap"
   | "earn"
   | "buy-on-bity"
   | "redeem"
@@ -23,15 +21,10 @@ const AppFeatureBtn = ({
 }) => {
   const { isConnected } = useAuth();
   const actions: Record<Feature, { icon: ReactNode; text: string }> = {
-    buy: {
-      icon: <Icon.BuyCrypto width={24} aria-label="Buy GLDT" />,
-      text: "Buy",
-    },
     transfer: {
       icon: <Icon.Transfer width={24} aria-label="Transfer" />,
       text: "Transfer",
     },
-    swap: { icon: <Icon.Swap width={24} aria-label="Swap" />, text: "Swap" },
     earn: { icon: <Icon.Earn aria-label="Earn" />, text: "Earn" },
     "buy-on-bity": {
       icon: <Icon.BuyOnBity aria-label="Buy on BITY" />,

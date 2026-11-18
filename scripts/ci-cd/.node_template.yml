@@ -1,13 +1,12 @@
 # NodeJS & NextJS job template
 
 .node template:
-  image: node:current-alpine3.22
-  cache:
-    - key: "node-$CI_COMMIT_REF_SLUG"
-      paths:
-        - .pnpm-store/
-        - node_modules/
-        - client/**/.next/
-        - client/**/node_modules/
+  # Exact versions of Node and pnpm, so a production build does not change with
+  # whatever a floating tag points to that day.
+  image: node:24.22.1-alpine3.23
+  # No cache. The node_modules cache that was here was keyed by the branch name,
+  # so tag pipelines never had a hit, and on develop it had grown to 180000
+  # files: restoring and saving it took 107 to 191 seconds per job (pipeline
+  # 65764), around an install of 22 to 33 seconds.
   before_script:
-    - npm install -g pnpm@latest-10
+    - npm install -g pnpm@10.34.9

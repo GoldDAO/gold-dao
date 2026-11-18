@@ -4,7 +4,7 @@ use serde_bytes::ByteBuf;
 use serde_json::{from_slice, Value};
 use types::HttpRequest;
 
-use crate::client::gldt_swap::http_request;
+use crate::client::gldt_stake::http_request;
 
 #[test]
 pub fn gldt_stake_metrics_endpoint_is_valid_json() {
