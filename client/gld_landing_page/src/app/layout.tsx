@@ -1,19 +1,13 @@
 import type { Metadata } from 'next'
+import { ogImage as image, siteName as title, siteUrl } from '@/site'
 import './globals.css'
 
-const title = 'Gold DAO'
 const description =
   'Gold DAO holds a treasury of staked ICP, OGY and WTN on the Internet Computer. GOLDAO stakers vote on what happens with it and receive a share of what it earns.'
-// public/og.png, 1200 x 630
-const image = {
-  url: '/og.png',
-  width: 1200,
-  height: 630,
-  alt: 'Gold DAO. Stake GOLDAO. Govern the treasury.'
-}
 
+// The home page. The docs pages set their own in src/docs/metadata.ts.
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.gold-dao.org'),
+  metadataBase: new URL(siteUrl),
   title,
   description,
   alternates: { canonical: '/' },

@@ -1,12 +1,22 @@
 import { MetadataRoute } from 'next'
- 
-export default function sitemap(): MetadataRoute.Sitemap {
+import { docsPages, docsPath } from '@/docs/nav'
+import { siteUrl } from '@/site'
+
+export default function sitemap (): MetadataRoute.Sitemap {
+  const lastModified = new Date()
+
   return [
     {
-      url: 'https://www.gold-dao.org/',
-      lastModified: new Date(),
+      url: `${siteUrl}/`,
+      lastModified,
       changeFrequency: 'yearly',
-      priority: 1,
+      priority: 1
     },
+    ...docsPages.map(page => ({
+      url: `${siteUrl}${docsPath(page.slug)}`,
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7
+    }))
   ]
 }

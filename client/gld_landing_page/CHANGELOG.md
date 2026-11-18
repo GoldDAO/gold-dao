@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.1.0] - 2026-11-18
+
+### Added
+
+- Docs under `/docs`, moved from the GitBook on docs.gold-dao.org and brought up to date: staking and claim guides, rewards, treasury, buyback and burn, GOLDAO token, canisters, brand assets, FAQ, Terms of Service and Privacy Policy
+- An unknown path under `/docs/`, such as an old GitBook link forwarded from docs.gold-dao.org, opens the docs introduction
+
+### Changed
+
+- The Docs link and the staking guide link open the new docs instead of the GitBook
+- Pages are exported as `<path>/index.html` so the asset canister serves `/docs` and `/docs/` alike
+
+### Removed
+
+- GitBook content that no longer applies to Gold DAO: GLDT staking, redeeming physical gold, the GLD NFT, GLDT and USDG token pages and logos, vault audit reports, partner page, roadmap, AMA summary and master spreadsheet
+
 ### [2.0.0] - 2026-11-18
 
 ### Changed
