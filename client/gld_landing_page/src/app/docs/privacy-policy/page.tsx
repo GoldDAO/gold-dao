@@ -15,7 +15,7 @@ export default function Page () {
       slug='privacy-policy'
       lead={
         <>
-          <strong>Last updated:</strong> 18 November 2026
+          <strong>Last updated:</strong> 19 November 2026
         </>
       }
     >
@@ -80,7 +80,7 @@ export default function Page () {
         </li>
         <li>
           <strong>Data API</strong>: the website loads the treasury figures
-          from api.gldt.org, and the app loads the gold price from there.
+          from api.gold-dao.org, and the app loads the gold price from there.
         </li>
         <li>
           <strong>Sign-in</strong>: the app lets you sign in with Internet

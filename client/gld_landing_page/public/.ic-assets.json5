@@ -9,12 +9,12 @@
     security_policy: "standard",
     headers: {
       "Referrer-Policy": "strict-origin-when-cross-origin",
-      // The page talks to two other hosts: api.gldt.org for the treasury
+      // The page talks to two other hosts: api.gold-dao.org for the treasury
       // figures (src/components/Treasury.tsx) and Adobe Fonts for the Polymath
       // typeface (src/app/layout.tsx). A new host has to be added here too,
       // the browser blocks it otherwise.
       "Content-Security-Policy":
-        "default-src 'self';script-src 'self' 'unsafe-inline';connect-src 'self' https://api.gldt.org;img-src 'self' data:;style-src 'self' 'unsafe-inline' https://use.typekit.net https://p.typekit.net;font-src https://use.typekit.net;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;",
+        "default-src 'self';script-src 'self' 'unsafe-inline';connect-src 'self' https://api.gold-dao.org;img-src 'self' data:;style-src 'self' 'unsafe-inline' https://use.typekit.net https://p.typekit.net;font-src https://use.typekit.net;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;",
       // Security: The permissions policy disables all features for security reasons. If your site needs such permissions, activate them.
       // To configure permissions go here https://www.permissionspolicy.com/
       "Permissions-Policy":

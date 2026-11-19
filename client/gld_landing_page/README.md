@@ -18,7 +18,7 @@ The page is then on `http://localhost:3000`.
 - `src/app/page.tsx` holds the home page and its copy.
 - `src/app/layout.tsx` holds the metadata of the home page (title, description, social preview) and loads the typeface.
 - `src/components/SiteHeader.tsx` and `SiteFooter.tsx` are the header and footer of every page.
-- `src/components/Treasury.tsx` is the treasury table. The browser reads it from `https://api.gldt.org/v1/daos/golddao/treasury/summary`. If the request fails or the response changes shape, a short notice replaces the table.
+- `src/components/Treasury.tsx` is the treasury table. The browser reads it from `https://api.gold-dao.org/v1/daos/golddao/treasury/summary`. If the request fails or the response changes shape, a short notice replaces the table.
 - `src/links.ts` lists every outgoing link.
 - `tailwind.config.ts` has the colors and typefaces, the same ones as `client/gld_dashboard`.
 - `public/.ic-assets.json5` sets the response headers of the asset canister, including the Content-Security-Policy. A new external host (an API, a font, an image) has to be added there or the browser blocks it.
