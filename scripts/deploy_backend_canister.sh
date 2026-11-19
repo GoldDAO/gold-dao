@@ -22,6 +22,35 @@ if [[ $NETWORK == ic && ! $CI_COMMIT_TAG =~ ^($CANISTER-v[0-9]+\.[0-9]+\.[0-9]+(
   exit 2
 fi
 
+WASM_PATH=backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz
+CHECKSUM_PATH=backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}.checksum
+
+# The wasm must be the one the staging or production build of this pipeline
+# made. "integration-test build" writes its wasm (built with the inttest
+# feature, which adds test endpoints) to the same path, and a deploy job that
+# also downloads the artifacts of that job installs the test wasm. That happened
+# in origyn-sns from April to November 2026, after the "needs" line of its
+# production deploy was commented out. The staging and production builds record
+# the sha256 of the wasm in the checksum file (scripts/build_canister.sh
+# --checksum); the integration-test build writes no checksum file. Local
+# deployments use a local build and are not checked.
+if [[ $NETWORK != "local" ]]; then
+  if [[ ! -f $WASM_PATH || ! -f $CHECKSUM_PATH ]]; then
+    echo "Error: $WASM_PATH or $CHECKSUM_PATH is missing. The deploy job needs the artifacts of the $NETWORK build of $CANISTER."
+    exit 1
+  fi
+  EXPECTED_SHA256=$(awk -v wasm="$WASM_PATH" '$2 == wasm { print $1 }' "$CHECKSUM_PATH")
+  ACTUAL_SHA256=$(sha256sum "$WASM_PATH" | cut -d ' ' -f 1)
+  if [[ -z $EXPECTED_SHA256 || $EXPECTED_SHA256 != "$ACTUAL_SHA256" ]]; then
+    echo "Error: $WASM_PATH is not the wasm of the $NETWORK build of $CANISTER."
+    echo "  sha256 of the file:       $ACTUAL_SHA256"
+    echo "  sha256 the build recorded: ${EXPECTED_SHA256:-none, the checksum file has no line for this file}"
+    echo "Check the \"needs\" of this deploy job: it must not get the artifacts of \"integration-test build\"."
+    exit 1
+  fi
+  echo "$WASM_PATH is the wasm of the $NETWORK build, sha256 $ACTUAL_SHA256"
+fi
+
 if [[ $DEPLOYMENT_VIA == "direct" || $NETWORK != "ic" ]]; then
 
   if [[ $REINSTALL == "reinstall" ]]; then
@@ -31,7 +60,7 @@ if [[ $DEPLOYMENT_VIA == "direct" || $NETWORK != "ic" ]]; then
       --network $NETWORK \
       --mode reinstall \
       --argument "$ARGUMENTS" \
-      --wasm backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
+      --wasm "$WASM_PATH" \
       -y
   else
     echo "Upgrading $CANISTER directly via dfx with arguments: $ARGUMENTS"
@@ -45,7 +74,7 @@ if [[ $DEPLOYMENT_VIA == "direct" || $NETWORK != "ic" ]]; then
       --network $NETWORK \
       --mode upgrade \
       --argument "$ARGUMENTS" \
-      --wasm backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
+      --wasm "$WASM_PATH" \
       -y
 
 
@@ -97,7 +126,7 @@ elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
     --canister-upgrade-arg "$ARGUMENTS" \
     --mode $INSTALL_MODE \
     --target-canister-id $(cat canister_ids.json | jq -r .$CANISTER.$NETWORK) \
-    --wasm-path backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
+    --wasm-path "$WASM_PATH" \
     --title "Upgrade $CANISTER to version $VERSION" \
     --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes - 2>&1 | tee console.log
 
