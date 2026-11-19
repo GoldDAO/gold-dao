@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.1.2] - 2026-11-19
+
+### Changed
+
+- Read the treasury figures from `api.gold-dao.org`, the new address of the Gold DAO API, instead of `api.gldt.org`. The Content-Security-Policy allows the new host and no longer the old one, and the Privacy Policy names the new host.
+
 ### [2.1.1] - 2026-11-18
 
 ### Changed

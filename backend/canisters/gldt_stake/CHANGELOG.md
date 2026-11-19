@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+#### Changed
+
+- **Token prices**: The hourly price job reads the price history from `api.gold-dao.org`, the new address of the Gold DAO API, instead of `api.gldt.org`.
+
+#### Fix
+
+- **Token prices**: The price history request accepts responses up to 128 KB instead of 32 KB. The GOLDAO history had grown past 32 KB, so every request for it failed and the canister kept an old GOLDAO price (0.004956 USD on 2026-11-19, while the 7-day median was 0.006048 USD). The APY was computed with that price.
+
 ### [1.0.18] - 2025-12-17
 
 #### Changed
