@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.19] - 2026-11-19
+
 #### Changed
 
 - **Token prices**: The hourly price job reads the price history from `api.gold-dao.org`, the new address of the Gold DAO API, instead of `api.gldt.org`.
