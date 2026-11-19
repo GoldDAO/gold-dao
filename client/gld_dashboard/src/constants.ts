@@ -59,7 +59,7 @@ export const GLDT_STAKE_CANISTER_ID = import.meta.env
 
 export const VERSION_DAPP = import.meta.env.VITE_VERSION;
 
-export const GLDT_API_BASE_URL = "https://api.gldt.org/v1";
+export const GLDT_API_BASE_URL = "https://api.gold-dao.org/v1";
 export const ICP_ICRC_API_BASE_URL =
   "https://icrc-api.internetcomputer.org/api/v1";
 export const OGY_API_BASE_URL = "https://api.origyn.com";

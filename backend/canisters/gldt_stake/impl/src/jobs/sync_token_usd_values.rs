@@ -66,7 +66,7 @@ async fn sync_token_usd_values_impl() {
         );
 
         let url = format!(
-            "https://api.gldt.org/v1/tokens/{}/price/history",
+            "https://api.gold-dao.org/v1/tokens/{}/price/history",
             token_symbol.symbol()
         );
 
@@ -74,7 +74,10 @@ async fn sync_token_usd_values_impl() {
             url: url.to_string(),
             method: HttpMethod::GET,
             body: None,
-            max_response_bytes: Some(1024 * 32), // allow larger history payload
+            // The API returns the whole daily history, about 40 bytes per day.
+            // In November 2026 the GOLDAO history was 36 KB and the ICP one 42 KB,
+            // so the earlier 32 KB limit made the GOLDAO request fail.
+            max_response_bytes: Some(1024 * 128),
             transform: Some(TransformContext {
                 function: TransformFunc::new(canister_self(), "transform".to_string()),
                 context: vec![],

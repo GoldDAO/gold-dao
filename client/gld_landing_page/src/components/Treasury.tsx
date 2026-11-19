@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 // Treasury summary of the Gold DAO analytics API: the liquid tokens of the SNS
 // treasury and the neurons the DAO controls, with their value in US dollars.
-const TREASURY_URL = 'https://api.gldt.org/v1/daos/golddao/treasury/summary'
+const TREASURY_URL = 'https://api.gold-dao.org/v1/daos/golddao/treasury/summary'
 const TIMEOUT_MS = 10_000
 
 interface Holding {
